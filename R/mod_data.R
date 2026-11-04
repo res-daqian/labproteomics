@@ -116,7 +116,7 @@ mod_data_server <- function(id, state) {
 
     output$boxes <- shiny::renderUI({
       ds <- state$ds %||% state$ds_raw
-      if (is.null(ds)) return(shiny::div(class = "alert alert-light border", "Import a quantification file to start. The demo dataset button fills in the retina atropine data (76 runs)."))
+      if (is.null(ds)) return(shiny::div(class = "alert alert-light border", "Import a quantification file to start. The demo dataset button fills in the retina atropine demo data (36 runs, Long-term stage)."))
       s <- import_summary(ds)
       bslib::layout_columns(
         col_widths = c(3, 3, 3, 3),

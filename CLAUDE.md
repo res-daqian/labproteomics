@@ -20,9 +20,15 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
 - Functions were **copied and refactored** from the PhD scripts, never sourced across repositories.
   `PROVENANCE.md` maps every engine function to its source script and commit. Keep it current.
 - The PhD results stay the reference: the golden tests in `tests/testthat/test-golden.R` must
-  reproduce the locked PhD numbers (LIMA_E vs LIM_E: 5963 tested / 36 hits; LIM_L vs CNT_L with the
-  two excluded animals: 6044 / 1985 / 1915; Long-term rescue: Tier 1 = 15, Tier 2 = 180). Run them
-  before any commit that touches `R/import.R`, `R/qc.R`, `R/dea.R` or `R/rescue.R`.
+  reproduce the locked PhD numbers on the demo data (36 Long-term runs; LIM_L vs CNT_L with the two
+  excluded animals: 6044 / 1985 / 1915; LIMA_L vs LIM_L: 6193 / 47; CNTA_L vs CNT_L: 6223 / 303;
+  Long-term rescue: Tier 1 = 15, Tier 2 = 180). With the full 76-run data the Early contrast
+  (LIMA_E vs LIM_E: 5963 / 36) is checked as well. Run them before any commit that touches
+  `R/import.R`, `R/qc.R`, `R/dea.R` or `R/rescue.R`.
+- Demo data are rebuilt only with `scripts/make_demo_subset.R` followed by
+  `scripts/make_demo_annotation.R`. The subset keeps the original row order and only the peptides
+  MS-DAP keeps on the full import; both are needed to reproduce the thesis numbers (see
+  `PROVENANCE.md`, section "Demo data").
 
 ## Architecture rules
 

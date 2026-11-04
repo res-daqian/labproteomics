@@ -35,7 +35,7 @@ mod_qc_server <- function(id, state) {
     shiny::observeEvent(input$run, {
       if (is.null(state$ds)) { shiny::showNotification("Attach the sample annotation first (page 1).", type = "warning"); return() }
       qc <- tryCatch(
-        shiny::withProgress(message = "Running QC", detail = "normalising all runs (about one minute for 76 runs)", value = 0.3,
+        shiny::withProgress(message = "Running QC", detail = "normalising all runs (about half a minute for the 36 demo runs)", value = 0.3,
                             qc_global(state$ds, min_peptides = input$min_peptides, norm = input$norm, mad_k = input$mad_k)),
         error = function(e) { notify_error("QC failed", e); NULL }
       )

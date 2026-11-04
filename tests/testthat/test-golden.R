@@ -1,4 +1,6 @@
 # Golden tests: the engine must reproduce the locked PhD results on the demo data.
+# The demo folder holds the Long-term (stage L) runs only (36 runs; scripts/make_demo_subset.R).
+# The Early contrast is checked only when the full 76-run data are present.
 demo <- normalizePath(file.path(testthat::test_path(), "..", "..", "demo_data"), mustWork = FALSE)
 report <- file.path(demo, "report.parquet")
 
@@ -8,13 +10,15 @@ test_that("the engine reproduces the locked PhD contrasts and rescue counts", {
   ds <- import_quant(report)
   ann <- read_annotation(file.path(demo, "demo_sample_annotation.csv"))
   ds <- attach_annotation(ds, ann)
-  expect_equal(nrow(ds$samples), 76)
+  expect_true(nrow(ds$samples) %in% c(36, 76))
 
-  r1 <- run_contrast(ds, contrast_spec("LIMA_E", "LIM_E", pair_by = "subject_id"), list(limma_check = FALSE))
-  expect_equal(r1$n_tested, 5963)
-  expect_equal(r1$n_hit_p, 36)
-  expect_equal(r1$n_hit_q, 0)
-  expect_equal(r1$n_pairs, 10)
+  if (all(c("LIMA_E", "LIM_E") %in% ds$samples$group)) {
+    r1 <- run_contrast(ds, contrast_spec("LIMA_E", "LIM_E", pair_by = "subject_id"), list(limma_check = FALSE))
+    expect_equal(r1$n_tested, 5963)
+    expect_equal(r1$n_hit_p, 36)
+    expect_equal(r1$n_hit_q, 0)
+    expect_equal(r1$n_pairs, 10)
+  }
 
   excl <- ds$samples$sample_id[ds$samples$subject_id %in% c("L_CTRL_4", "L_CTRL_BLK")]
   expect_length(excl, 4)

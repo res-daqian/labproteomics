@@ -79,7 +79,10 @@ interface and is written to the run record.
 
 ## Status (2026-11-04)
 
-First version for the lab-meeting demo. DIA-NN input is tested on the demo data (76 runs);
-Spectronaut and FragPipe imports call the MS-DAP importers but have not been tested with data.
-Computation runs in the foreground with a progress bar; the global QC takes about one minute
-for 76 runs. Enrichment covers the Hallmark collection only.
+First version for the lab-meeting demo. DIA-NN input is tested with real data: the full 76-run report
+of the retina atropine study during development, and the 36 Long-term runs that form the demo data
+(the demo reproduces the thesis numbers). Spectronaut and FragPipe imports call the MS-DAP importers
+but have not been tested with data. Computation runs in the foreground with a progress bar; the
+global QC takes about half a minute for 36 runs. Enrichment covers the Hallmark collection only.
+The demo data are not part of the package or the repository; `scripts/make_demo_subset.R` followed
+by `scripts/make_demo_annotation.R` rebuilds them from the PhD inputs (see `PROVENANCE.md`).

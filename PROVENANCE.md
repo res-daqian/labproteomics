@@ -17,3 +17,24 @@ Functions were copied and refactored; nothing is sourced across repositories.
 
 Not ported (thesis-specific): stages 03c–03l (profile plots for the PRM panel, validation ranking,
 pathway crosstalk, biology themes, evidence matrix, PRM selection).
+
+## Demo data (`demo_data/`; the parquet and the FASTA are gitignored)
+
+| file | source (read only) | how it was made |
+|---|---|---|
+| `report.parquet` (36 runs, 361 MB) | PhD `data_locked/inputs/diann_v231_output_msaccuracy_auto/report.parquet` (DIA-NN 2.3.1, 76 runs) | `scripts/make_demo_subset.R` (2026-11-04): Long-term (stage L) runs only; rows limited to the peptides MS-DAP keeps on the full 76-run import (best charge state per modified sequence, plain sequences mapped to one protein group); original row order preserved. |
+| `_phd_sample_metadata_source.csv` | PhD `data_locked/inputs/sample_metadata.csv` | same script; stage L rows only |
+| `demo_sample_annotation.csv` | derived from the two files above | `scripts/make_demo_annotation.R` |
+| `guineapig_rev_and_unrev_2025_12_19.fasta` | PhD `data_locked/inputs/` | copied read-only |
+| `guinea_pig_to_human_ortholog_map.csv` | PhD project ortholog map | copied |
+
+Why the subset is built this way (both findings are from 2026-11-04, verified with the golden tests):
+
+1. MS-DAP decides per data set which charge state of a modified sequence is kept and which plain
+   sequences are ambiguous (mapped to more than one protein group). A plain 36-run row filter keeps
+   peptides the 76-run import had removed, and the Long-term contrasts then differ by a few hits
+   (LIM_L vs CNT_L 1962 instead of 1985; CNTA_L vs CNT_L 301 instead of 303; Tier 2 163 instead of 180).
+2. MS-DAP's normalisation and roll-up are numerically sensitive to the row order of the input. With
+   identical peptides but scrambled rows, protein intensities moved by up to 0.034 log2 and 8
+   borderline hits (p between 0.02 and 0.056) changed status in CNTA_L vs CNT_L (309 instead of 303).
+   Reading the parquet as one table and subsetting in R keeps the order, and the numbers are exact.
