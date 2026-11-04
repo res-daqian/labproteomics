@@ -15,21 +15,25 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
 
 ## Isolation from the PhD project (never break)
 
-- Never write into `../phd-thesis-atropine`. Demo data were cloned read-only into `demo_data/`
-  (gitignored). If a PhD-side export is needed, create it here.
+- Never write into `../phd-thesis-atropine`. If a PhD-side export is needed, create it here.
+- **No laboratory data ship with the workbench.** The demo (`demo_data/`) is the public PRIDE data
+  set PXD079891 (HUVEC, MANCR knockdown vs control, 8 donors, 16 runs, DIA-NN 1.9, CC0), fetched by
+  `scripts/get_demo_data.R`; the parquet and the optional FASTA are gitignored, the small files
+  (stats, log, SDRF, annotation, settings, README) are committed. Daqian decided this on
+  2026-11-05 ("放弃用我自己的数据").
+- The thesis subset (36 Long-term runs, Daqian's own data) lives in `golden_data/` (fully
+  gitignored, read-only copies) and is used only by the golden tests. It is rebuilt with
+  `scripts/make_golden_subset.R` followed by `scripts/make_golden_annotation.R`.
 - Functions were **copied and refactored** from the PhD scripts, never sourced across repositories.
   `PROVENANCE.md` maps every engine function to its source script and commit. Keep it current.
 - The PhD results stay the reference: the golden tests in `tests/testthat/test-golden.R` must
-  reproduce the locked PhD numbers on the demo data (36 Long-term runs; LIM_L vs CNT_L with the two
+  reproduce the locked PhD numbers on `golden_data/` (36 Long-term runs; LIM_L vs CNT_L with the two
   excluded animals: 6044 / 1985 / 1915; LIMA_L vs LIM_L: 6193 / 47; CNTA_L vs CNT_L: 6223 / 303;
   Long-term rescue: Tier 1 = 15, Tier 2 = 180). With the full 76-run data the Early contrast
-  (LIMA_E vs LIM_E: 5963 / 36) is checked as well. Run them before any commit that touches
-  `R/import.R`, `R/qc.R`, `R/dea.R` or `R/rescue.R`.
-- Demo data are rebuilt only with `scripts/make_demo_subset.R` followed by
-  `scripts/make_demo_annotation.R`. The subset keeps the original row order and only the peptides
-  MS-DAP keeps on the full import; both are needed to reproduce the thesis numbers (see
-  `PROVENANCE.md`, section "Demo data"). `demo_data/report.stats.tsv` (36 rows) and
-  `demo_data/report.log.txt` come from the same PhD input folder and are gitignored too.
+  (LIMA_E vs LIM_E: 5963 / 36) is checked as well. Run them with `NOT_CRAN=true` before any commit
+  that touches `R/import.R`, `R/qc.R`, `R/dea.R` or `R/rescue.R`.
+- The golden subset keeps the original row order and only the peptides MS-DAP keeps on the full
+  import; both are needed to reproduce the thesis numbers (see `PROVENANCE.md`, "Golden data").
 - The git tag `demo-2026-11-06-safe` marks the first demo-ready version (2026-11-04). Keep it.
 
 ## Architecture rules
@@ -49,7 +53,14 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   unpaired contrasts are labelled as such; leave-one-out fragility, detection-only differences and
   treat columns describe the hits and never change them; the ORA background is always the
   quantified proteins of the contrast.
-- **Figures:** black-grey-red house style (`theme_lab_proteomics`, `group_colours`), thin axes, no grid.
+- **Figures:** Daqian's palettes (2026-11-05; constants in `R/theme.R`: qualitative
+  `LP_QUALITATIVE`, diverging `LP_DIVERGING`, sequential `LP_SEQ_COOL` / `LP_SEQ_WARM`), Arial,
+  left and bottom hairline axes only, no grid, no panel box, narrow bars, open circles for samples.
+  Red = case / increase / flag, teal = control / decrease / main series. PDF via cairo, PNG via ragg.
+- **Interface:** teal `#015069` as the working colour, red `#c71e1d` only for alerts and hits;
+  body font Avenir Next / Segoe UI (system stack), headings and tile values in Charter / Palatino /
+  Georgia (system serif stack); no web fonts are downloaded. The Rescue page is shown only when
+  the attached design has three or more groups (`nav_show` / `nav_hide` in `app_server`).
 - **Language:** interface and documents in plain ESL-safe English (no idioms, one idea per
   sentence, define abbreviations). Chat with Daqian in Chinese. `PROGRESS.md` is Chinese.
 - **Cross-platform:** Mac and Windows. No shell-only tricks in R code; paths via `file.path`;
@@ -71,7 +82,9 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   `dea`, `dea_extras`, `rescue`, `enrichment`, `export`, `report`) and interface (`app.R` with the
   theme and the building blocks `stat_tile`, `page_header`, `msg_list`; `mod_*.R`).
   `inst/report/run_report.Rmd` report template.
-- `tests/testthat/` unit tests + golden tests. `demo_data/` demo inputs (gitignored large files).
-- `runs/` run records (gitignored). `scripts/` helpers (`launch_app.R`, `make_demo_annotation.R`).
+- `tests/testthat/` unit tests + golden tests. `demo_data/` public demo (large files gitignored;
+  `demo_data/README.md`). `golden_data/` thesis subset for the golden tests (gitignored).
+- `runs/` run records (gitignored). `scripts/` helpers (`launch_app.R`, `get_demo_data.R`,
+  `make_golden_subset.R`, `make_golden_annotation.R`).
 - `docs/` demo script, QC primer for Daqian (`qc_primer_CN.md`) and notes. `README.md` user guide
   (Mac / Windows install and start).

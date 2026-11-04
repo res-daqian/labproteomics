@@ -24,7 +24,8 @@ analysis without writing code:
    plot); per-protein abundance plot with quantification counts; result tables, CSV download.
 4. **Rescue** — classify proteins by whether a treatment reverses a disease effect
    (Tier 1 / Tier 2 with the definitions printed next to the counts; fragility of each hit carried
-   from the leave-one-out refits).
+   from the leave-one-out refits). The page appears only when the attached design has at least
+   three groups (a disease contrast and a treatment contrast are needed).
 5. **Enrichment** — GSEA (fgsea, ranked by the model t-statistic) or ORA (hypergeometric, with
    the proteins quantified in the contrast as background) on MSigDB Hallmark, GO (BP, CC, MF),
    Reactome, KEGG MEDICUS or cell-type signatures, with an optional ortholog table (for example
@@ -44,7 +45,8 @@ The statistical engine is a set of plain R functions in `R/`; the interface only
 - R packages: `msdap` (from GitHub, with its Bioconductor dependencies), `shiny`, `bslib`, `DT`,
   `dplyr`, `tidyr`, `readr`, `ggplot2`, `ggrepel`, `patchwork`, `limma`, `DEqMS`, `fgsea`,
   `msigdbr` (version 10 or newer; the gene sets are bundled), `rmarkdown`, `digest`, `jsonlite`,
-  `rlang`. Optional: `readxl` (Excel annotation).
+  `rlang`, `arrow` (reads DIA-NN parquet reports), `ragg` and `systemfonts` (Arial in figures).
+  Optional: `readxl` (Excel annotation).
 
 ## Install (first time)
 
@@ -53,8 +55,16 @@ install.packages(c("devtools", "BiocManager"))
 BiocManager::install(c("limma", "DEqMS", "fgsea", "MSnbase", "ProtGenerics", "vsn"))
 devtools::install_github("ftwkoopmans/msdap")        # follow the MS-DAP page if a dependency fails
 install.packages(c("shiny", "bslib", "DT", "dplyr", "tidyr", "readr", "ggplot2", "ggrepel",
-                   "patchwork", "msigdbr", "rmarkdown", "digest", "jsonlite", "rlang", "readxl"))
+                   "patchwork", "msigdbr", "rmarkdown", "digest", "jsonlite", "rlang", "readxl",
+                   "arrow", "ragg", "systemfonts"))
 devtools::install("path/to/gui_development_proteomics_workflow")   # this folder
+```
+
+Then fetch the demo data once (164 MB from the PRIDE archive; see "Demo data" below):
+
+```r
+# in a terminal, inside this folder
+Rscript scripts/get_demo_data.R
 ```
 
 MS-DAP installation notes for Windows and macOS: https://github.com/ftwkoopmans/msdap
@@ -70,6 +80,18 @@ labproteomics::run_app(demo_dir = "path/to/demo_data", runs_dir = "path/to/runs"
 ```
 
 The application opens in the default browser. Close the R process to stop it.
+
+## Demo data
+
+The demo button on the Data page fills in a public data set: PRIDE
+[PXD079891](https://www.ebi.ac.uk/pride/archive/projects/PXD079891) (Zhang SY et al., *The Journal
+of Physiology* 2026, DOI [10.1113/JP292141](https://doi.org/10.1113/JP292141); CC0). Human
+umbilical vein endothelial cells from 8 donors (4 female, 4 male), each preparation transfected
+with a control oligonucleotide or an oligonucleotide against the lncRNA MANCR; 16 runs on an
+Orbitrap Exploris 480, searched with DIA-NN 1.9. The contrast `MANCR_KD vs Control` is paired by
+donor. `demo_data/README.md` describes the files and the annotation; `scripts/get_demo_data.R`
+downloads them from PRIDE (the large files are not in the repository). No data from this
+laboratory are shipped with the workbench.
 
 ## Sample annotation
 
@@ -94,6 +116,13 @@ interface and is written to the run record. Additional outputs of the differenti
 (detection-only differences with present >= 80% / absent <= 20%, limma treat columns, leave-one-out
 stability) do not change the hits; they describe them.
 
+## Figures
+
+Figures use the house palettes (a qualitative set with teal `#015069` and red `#c71e1d`, a
+diverging red-to-teal set, and two sequential ramps), Arial, hairline axes and ticks, no grid,
+narrow bars and open circles for individual samples. PDF figures embed the font (cairo device);
+PNG figures are drawn with ragg. The interface uses the same colours.
+
 ## Quality-control inputs
 
 - The run scorecard needs the search engine's per-run statistics next to the report
@@ -106,15 +135,16 @@ stability) do not change the hits; they describe them.
 - Pooled QC or standard injections are recognised by `pool`, `QC`, `HeLa`, `standard` or `blank`
   in the group label or the sample name. Keep them out of the contrasts.
 
-## Status (2026-11-05)
+## Status (2026-11-05, third version)
 
-Second version. DIA-NN input is tested with real data: the full 76-run report of the retina
-atropine study during development, and the 36 Long-term runs that form the demo data (the demo
-reproduces the thesis numbers; golden tests). Spectronaut and FragPipe imports call the MS-DAP
-importers but have not been tested with data; the run scorecard reads DIA-NN statistics only.
-Computation runs in the foreground with a progress bar; the global QC takes about half a minute
-for 36 runs and a contrast 12 to 27 seconds including the leave-one-out refits. The demo data are
-not part of the package or the repository; `scripts/make_demo_subset.R` followed by
-`scripts/make_demo_annotation.R` rebuilds them from the PhD inputs (see `PROVENANCE.md`).
-Not yet done: phenotype association, msqrob2 as a second engine, chick ortholog map, Windows
-real-machine test, asynchronous computation.
+DIA-NN input is tested with real data: the public PXD079891 demo (16 runs, DIA-NN 1.9) and,
+during development, the 76-run and 36-run reports of the retina atropine study (DIA-NN 2.3.1).
+The thesis numbers are reproduced by golden tests on a local 36-run subset (`golden_data/`, not
+shipped; `scripts/make_golden_subset.R` and `scripts/make_golden_annotation.R` rebuild it from the
+PhD inputs). Spectronaut and FragPipe imports call the MS-DAP importers but have not been tested
+with data; the run scorecard reads DIA-NN statistics only. Computation runs in the foreground
+with a progress bar; on the demo data the import takes 4 seconds, the QC about 35 seconds and a
+paired contrast about 35 seconds including the leave-one-out refits. Without a FASTA the gene
+symbols and protein names come from the DIA-NN report itself. Not yet done: phenotype
+association, msqrob2 as a second engine, chick ortholog map, Windows real-machine test,
+asynchronous computation.
