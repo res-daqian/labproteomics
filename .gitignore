@@ -2,6 +2,9 @@
 demo_data/*.parquet
 demo_data/*.fasta
 demo_data/*.rds
+demo_data/*_tmp.*
+# thesis-derived inputs used only by the golden tests (Daqian's own data; never shipped)
+golden_data/
 runs/
 *.rds
 .Rproj.user/
@@ -13,5 +16,3 @@ inst/doc
 /Meta/
 *.html
 !inst/report/*.html
-demo_data/*.stats.tsv
-demo_data/*.log.txt

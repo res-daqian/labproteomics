@@ -1,0 +1,728 @@
+DIA-NN 1.9 (Data-Independent Acquisition by Neural Networks)
+Compiled on Jun  8 2024 20:00:31
+Current date and time: Fri Apr 17 10:55:21 2026
+CPU: AuthenticAMD AMD EPYC 7543 32-Core Processor
+SIMD instructions: AVX AVX2 FMA SSE4.1 SSE4.2 SSE4a 
+Logical CPU cores: 64
+diann.exe --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-01.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-02.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-03.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-04.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-05.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-06.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-07.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-08.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-09.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-10.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-11.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-12.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-13.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-14.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-15.mzML  --f D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-16.mzML  --lib  --threads 64 --verbose 1 --out D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.tsv --qvalue 0.01 --matrices --out-lib D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\1.tsv --gen-spec-lib --predictor --fasta D:\Project\2026Q1\ZP\uniprotkb_taxonomy_id_9606_AND_reviewed_2024_11_11.fasta --fasta-search --min-fr-mz 200 --max-fr-mz 1800 --met-excision --min-pep-len 7 --max-pep-len 30 --min-pr-mz 300 --max-pr-mz 1800 --min-pr-charge 1 --max-pr-charge 4 --cut K*,R*,!*P --missed-cleavages 2 --unimod4 --var-mods 1 --var-mod UniMod:35,15.994915,M --var-mod UniMod:1,42.010565,*n --mass-acc 20 --mass-acc-ms1 20 --peptidoforms --reanalyse --relaxed-prot-inf --rt-profiling 
+
+Thread number set to 64
+Output will be filtered at 0.01 FDR
+Precursor/protein x samples expression level matrices will be saved along with the main report
+A spectral library will be generated
+Deep learning will be used to generate a new in silico spectral library from peptides provided
+Library-free search enabled
+Min fragment m/z set to 200
+Max fragment m/z set to 1800
+N-terminal methionine excision enabled
+Min peptide length set to 7
+Max peptide length set to 30
+Min precursor m/z set to 300
+Max precursor m/z set to 1800
+Min precursor charge set to 1
+Max precursor charge set to 4
+In silico digest will involve cuts at K*,R*
+But excluding cuts at *P
+Maximum number of missed cleavages set to 2
+Cysteine carbamidomethylation enabled as a fixed modification
+Maximum number of variable modifications set to 1
+Modification UniMod:35 with mass delta 15.9949 at M will be considered as variable
+Modification UniMod:1 with mass delta 42.0106 at *n will be considered as variable
+Peptidoform scoring enabled
+A spectral library will be created from the DIA runs and used to reanalyse them; .quant files will only be saved to disk during the first step
+Heuristic protein grouping will be used, to reduce the number of protein groups obtained; this mode is recommended for benchmarking protein ID numbers, GO/pathway and system-scale analyses
+The spectral library (if generated) will retain the original spectra but will include empirically-aligned RTs
+Mass accuracy will be fixed to 2e-05 (MS2) and 2e-05 (MS1)
+Exclusion of fragments shared between heavy and light peptides from quantification is not supported in FASTA digest mode - disabled; to enable, generate an in silico predicted spectral library and analyse with this library
+WARNING: it is strongly recommended to first generate an in silico-predicted library in a separate pipeline step and then use it to process the raw data, now without activating FASTA digest
+The following variable modifications will be scored: UniMod:35 UniMod:1 
+
+16 files will be processed
+[0:00] Loading FASTA D:\Project\2026Q1\ZP\uniprotkb_taxonomy_id_9606_AND_reviewed_2024_11_11.fasta
+[0:05] Processing FASTA
+[0:27] Assembling elution groups
+[0:40] 8683476 precursors generated
+[0:40] Gene names missing for some isoforms
+[0:40] Library contains 20391 proteins, and 20177 genes
+[0:41] [1:08] [40:26] [46:13] [46:18] [46:20] Saving the library to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\1.predicted.speclib
+[47:04] Initialising library
+
+First pass: generating a spectral library from DIA data
+
+[47:31] File #1/16
+[47:31] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-01.mzML
+[48:04] 5965774 library precursors are potentially detectable
+[48:12] Processing...
+[48:43] RT window set to 6.60087
+[48:43] Peak width: 5.22
+[48:43] Scan window radius set to 11
+[48:44] Recommended MS1 mass accuracy setting: 7.51324 ppm
+[54:41] Removing low confidence identifications
+[58:32] Precursors at 1% peptidoform FDR: 73175
+[58:47] Removing interfering precursors
+[59:55] Training neural networks: 135404 targets, 91695 decoys
+[60:22] Number of IDs at 0.01 FDR: 91700
+[60:52] Precursors at 1% peptidoform FDR: 74833
+[60:56] Calculating protein q-values
+[60:59] Number of genes identified at 1% FDR: 7254 (precursor-level), 6417 (protein-level) (inference performed using proteotypic peptides only)
+[61:00] Quantification
+[61:04] Precursors with monitored PTMs at 1% FDR: 881 out of 22680 considered
+[61:04] Unmodified precursors with monitored PTM sites at 1% FDR: 16557
+[61:04] Precursors with PTMs localised (when required) with > 90% confidence: 856 out of 881
+[61:07] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-01.mzML.quant
+
+[61:08] File #2/16
+[61:08] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-02.mzML
+[62:16] 5965774 library precursors are potentially detectable
+[62:32] Processing...
+[64:25] RT window set to 7.08777
+[64:27] Recommended MS1 mass accuracy setting: 6.12928 ppm
+[73:00] Removing low confidence identifications
+[77:36] Precursors at 1% peptidoform FDR: 70349
+[77:40] Removing interfering precursors
+[78:05] Training neural networks: 138607 targets, 91487 decoys
+[78:31] Number of IDs at 0.01 FDR: 87946
+[78:59] Precursors at 1% peptidoform FDR: 72514
+[79:02] Calculating protein q-values
+[79:05] Number of genes identified at 1% FDR: 7144 (precursor-level), 6334 (protein-level) (inference performed using proteotypic peptides only)
+[79:05] Quantification
+[79:07] Precursors with monitored PTMs at 1% FDR: 677 out of 16696 considered
+[79:07] Unmodified precursors with monitored PTM sites at 1% FDR: 12550
+[79:08] Precursors with PTMs localised (when required) with > 90% confidence: 673 out of 677
+[79:10] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-02.mzML.quant
+
+[79:11] File #3/16
+[79:11] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-03.mzML
+[80:12] 5965774 library precursors are potentially detectable
+[80:27] Processing...
+[81:55] RT window set to 6.91244
+[81:56] Recommended MS1 mass accuracy setting: 6.06665 ppm
+[89:12] Removing low confidence identifications
+[91:42] Precursors at 1% peptidoform FDR: 73330
+[91:45] Removing interfering precursors
+[92:06] Training neural networks: 141787 targets, 93711 decoys
+[92:34] Number of IDs at 0.01 FDR: 91266
+[92:56] Precursors at 1% peptidoform FDR: 77368
+[92:59] Calculating protein q-values
+[93:00] Number of genes identified at 1% FDR: 7212 (precursor-level), 6408 (protein-level) (inference performed using proteotypic peptides only)
+[93:01] Quantification
+[93:03] Precursors with monitored PTMs at 1% FDR: 894 out of 18783 considered
+[93:03] Unmodified precursors with monitored PTM sites at 1% FDR: 14669
+[93:03] Precursors with PTMs localised (when required) with > 90% confidence: 881 out of 894
+[93:05] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-03.mzML.quant
+
+[93:06] File #4/16
+[93:06] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-04.mzML
+[93:57] 5965774 library precursors are potentially detectable
+[94:09] Processing...
+[95:07] RT window set to 7.31733
+[95:08] Recommended MS1 mass accuracy setting: 5.00045 ppm
+[101:07] Removing low confidence identifications
+[103:33] Precursors at 1% peptidoform FDR: 85302
+[103:41] Removing interfering precursors
+[104:16] Training neural networks: 154698 targets, 105162 decoys
+[104:43] Number of IDs at 0.01 FDR: 103019
+[105:02] Precursors at 1% peptidoform FDR: 85995
+[105:04] Calculating protein q-values
+[105:05] Number of genes identified at 1% FDR: 7522 (precursor-level), 6748 (protein-level) (inference performed using proteotypic peptides only)
+[105:05] Quantification
+[105:07] Precursors with monitored PTMs at 1% FDR: 918 out of 23982 considered
+[105:07] Unmodified precursors with monitored PTM sites at 1% FDR: 18046
+[105:07] Precursors with PTMs localised (when required) with > 90% confidence: 904 out of 918
+[105:09] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-04.mzML.quant
+
+[105:09] File #5/16
+[105:09] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-05.mzML
+[105:42] 5965774 library precursors are potentially detectable
+[105:50] Processing...
+[106:33] RT window set to 7.9489
+[106:34] Recommended MS1 mass accuracy setting: 5.23868 ppm
+[110:02] Removing low confidence identifications
+[111:51] Precursors at 1% peptidoform FDR: 47282
+[111:53] Removing interfering precursors
+[112:05] Training neural networks: 87469 targets, 57728 decoys
+[112:20] Number of IDs at 0.01 FDR: 60625
+[112:29] Precursors at 1% peptidoform FDR: 50657
+[112:31] Calculating protein q-values
+[112:32] Number of genes identified at 1% FDR: 6001 (precursor-level), 5282 (protein-level) (inference performed using proteotypic peptides only)
+[112:32] Quantification
+[112:33] Precursors with monitored PTMs at 1% FDR: 704 out of 15742 considered
+[112:33] Unmodified precursors with monitored PTM sites at 1% FDR: 11872
+[112:33] Precursors with PTMs localised (when required) with > 90% confidence: 691 out of 704
+[112:34] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-05.mzML.quant
+
+[112:34] File #6/16
+[112:34] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-06.mzML
+[113:00] 5965774 library precursors are potentially detectable
+[113:08] Processing...
+[113:46] RT window set to 8.34482
+[113:47] Recommended MS1 mass accuracy setting: 5.15081 ppm
+[118:12] Removing low confidence identifications
+[121:14] Precursors at 1% peptidoform FDR: 46340
+[121:20] Removing interfering precursors
+[121:58] Training neural networks: 89067 targets, 61350 decoys
+[122:18] Number of IDs at 0.01 FDR: 59296
+[122:26] Precursors at 1% peptidoform FDR: 49929
+[122:27] Calculating protein q-values
+[122:28] Number of genes identified at 1% FDR: 5860 (precursor-level), 5142 (protein-level) (inference performed using proteotypic peptides only)
+[122:28] Quantification
+[122:29] Precursors with monitored PTMs at 1% FDR: 604 out of 15216 considered
+[122:29] Unmodified precursors with monitored PTM sites at 1% FDR: 11878
+[122:29] Precursors with PTMs localised (when required) with > 90% confidence: 598 out of 604
+[122:30] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-06.mzML.quant
+
+[122:30] File #7/16
+[122:30] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-07.mzML
+[122:56] 5965774 library precursors are potentially detectable
+[123:01] Processing...
+[123:22] RT window set to 6.97817
+[123:23] Recommended MS1 mass accuracy setting: 5.26098 ppm
+[126:37] Removing low confidence identifications
+[128:12] Precursors at 1% peptidoform FDR: 77077
+[128:13] Removing interfering precursors
+[128:24] Training neural networks: 142993 targets, 98362 decoys
+[128:37] Number of IDs at 0.01 FDR: 94372
+[128:50] Precursors at 1% peptidoform FDR: 78677
+[128:51] Calculating protein q-values
+[128:52] Number of genes identified at 1% FDR: 7316 (precursor-level), 6494 (protein-level) (inference performed using proteotypic peptides only)
+[128:52] Quantification
+[128:53] Precursors with monitored PTMs at 1% FDR: 697 out of 23342 considered
+[128:53] Unmodified precursors with monitored PTM sites at 1% FDR: 17960
+[128:53] Precursors with PTMs localised (when required) with > 90% confidence: 682 out of 697
+[128:54] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-07.mzML.quant
+
+[128:54] File #8/16
+[128:54] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-08.mzML
+[129:26] 5965774 library precursors are potentially detectable
+[129:31] Processing...
+[129:51] RT window set to 7.85869
+[129:52] Recommended MS1 mass accuracy setting: 7.15513 ppm
+[134:00] Removing low confidence identifications
+[136:26] Precursors at 1% peptidoform FDR: 82008
+[136:29] Removing interfering precursors
+[136:41] Training neural networks: 149362 targets, 104970 decoys
+[136:55] Number of IDs at 0.01 FDR: 100632
+[137:09] Precursors at 1% peptidoform FDR: 82562
+[137:10] Calculating protein q-values
+[137:11] Number of genes identified at 1% FDR: 7519 (precursor-level), 6744 (protein-level) (inference performed using proteotypic peptides only)
+[137:11] Quantification
+[137:13] Precursors with monitored PTMs at 1% FDR: 927 out of 24619 considered
+[137:13] Unmodified precursors with monitored PTM sites at 1% FDR: 18309
+[137:13] Precursors with PTMs localised (when required) with > 90% confidence: 915 out of 927
+[137:14] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-08.mzML.quant
+
+[137:14] File #9/16
+[137:14] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-09.mzML
+[137:47] 5965774 library precursors are potentially detectable
+[137:55] Processing...
+[138:26] RT window set to 6.25449
+[138:27] Recommended MS1 mass accuracy setting: 5.58407 ppm
+[141:26] Removing low confidence identifications
+[142:47] Precursors at 1% peptidoform FDR: 82324
+[142:48] Removing interfering precursors
+[142:59] Training neural networks: 151230 targets, 105790 decoys
+[143:16] Number of IDs at 0.01 FDR: 101846
+[143:32] Precursors at 1% peptidoform FDR: 83977
+[143:33] Calculating protein q-values
+[143:34] Number of genes identified at 1% FDR: 7572 (precursor-level), 6757 (protein-level) (inference performed using proteotypic peptides only)
+[143:34] Quantification
+[143:35] Precursors with monitored PTMs at 1% FDR: 908 out of 24720 considered
+[143:35] Unmodified precursors with monitored PTM sites at 1% FDR: 18705
+[143:35] Precursors with PTMs localised (when required) with > 90% confidence: 893 out of 908
+[143:37] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-09.mzML.quant
+
+[143:37] File #10/16
+[143:37] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-10.mzML
+[144:10] 5965774 library precursors are potentially detectable
+[144:15] Processing...
+[144:43] RT window set to 7.13211
+[144:43] Recommended MS1 mass accuracy setting: 5.48029 ppm
+[148:15] Removing low confidence identifications
+[149:53] Precursors at 1% peptidoform FDR: 89375
+[149:55] Removing interfering precursors
+[150:05] Training neural networks: 161513 targets, 111511 decoys
+[150:17] Number of IDs at 0.01 FDR: 107672
+[150:28] Precursors at 1% peptidoform FDR: 87955
+[150:29] Calculating protein q-values
+[150:30] Number of genes identified at 1% FDR: 7727 (precursor-level), 6835 (protein-level) (inference performed using proteotypic peptides only)
+[150:30] Quantification
+[150:31] Precursors with monitored PTMs at 1% FDR: 960 out of 26227 considered
+[150:31] Unmodified precursors with monitored PTM sites at 1% FDR: 19648
+[150:31] Precursors with PTMs localised (when required) with > 90% confidence: 942 out of 960
+[150:32] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-10.mzML.quant
+
+[150:32] File #11/16
+[150:32] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-11.mzML
+[150:57] 5965774 library precursors are potentially detectable
+[151:07] Processing...
+[151:50] RT window set to 7.55866
+[151:51] Recommended MS1 mass accuracy setting: 5.56759 ppm
+[158:31] Removing low confidence identifications
+[161:06] Precursors at 1% peptidoform FDR: 75841
+[161:07] Removing interfering precursors
+[161:25] Training neural networks: 138540 targets, 95514 decoys
+[161:44] Number of IDs at 0.01 FDR: 95573
+[162:04] Precursors at 1% peptidoform FDR: 78518
+[162:07] Calculating protein q-values
+[162:09] Number of genes identified at 1% FDR: 7338 (precursor-level), 6517 (protein-level) (inference performed using proteotypic peptides only)
+[162:10] Quantification
+[162:12] Precursors with monitored PTMs at 1% FDR: 944 out of 24043 considered
+[162:12] Unmodified precursors with monitored PTM sites at 1% FDR: 18123
+[162:12] Precursors with PTMs localised (when required) with > 90% confidence: 931 out of 944
+[162:13] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-11.mzML.quant
+
+[162:13] File #12/16
+[162:13] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-12.mzML
+[162:55] 5965774 library precursors are potentially detectable
+[163:05] Processing...
+[163:51] RT window set to 6.99666
+[163:52] Recommended MS1 mass accuracy setting: 4.86869 ppm
+[171:21] Removing low confidence identifications
+[174:05] Precursors at 1% peptidoform FDR: 83582
+[174:07] Removing interfering precursors
+[174:44] Training neural networks: 151090 targets, 105816 decoys
+[175:09] Number of IDs at 0.01 FDR: 102666
+[175:51] Precursors at 1% peptidoform FDR: 83471
+[175:53] Calculating protein q-values
+[175:54] Number of genes identified at 1% FDR: 7569 (precursor-level), 6700 (protein-level) (inference performed using proteotypic peptides only)
+[175:54] Quantification
+[176:00] Precursors with monitored PTMs at 1% FDR: 846 out of 25125 considered
+[176:00] Unmodified precursors with monitored PTM sites at 1% FDR: 18740
+[176:01] Precursors with PTMs localised (when required) with > 90% confidence: 835 out of 846
+[176:09] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-12.mzML.quant
+
+[176:10] File #13/16
+[176:10] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-13.mzML
+[177:13] 5965774 library precursors are potentially detectable
+[177:24] Processing...
+[177:50] RT window set to 6.98468
+[177:51] Recommended MS1 mass accuracy setting: 4.88683 ppm
+[180:58] Removing low confidence identifications
+[182:41] Precursors at 1% peptidoform FDR: 84353
+[182:42] Removing interfering precursors
+[182:51] Training neural networks: 149147 targets, 104405 decoys
+[183:00] Number of IDs at 0.01 FDR: 103602
+[183:17] Precursors at 1% peptidoform FDR: 85205
+[183:19] Calculating protein q-values
+[183:20] Number of genes identified at 1% FDR: 7550 (precursor-level), 6758 (protein-level) (inference performed using proteotypic peptides only)
+[183:20] Quantification
+[183:21] Precursors with monitored PTMs at 1% FDR: 969 out of 25215 considered
+[183:21] Unmodified precursors with monitored PTM sites at 1% FDR: 18867
+[183:21] Precursors with PTMs localised (when required) with > 90% confidence: 960 out of 969
+[183:22] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-13.mzML.quant
+
+[183:22] File #14/16
+[183:22] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-14.mzML
+[183:57] 5965774 library precursors are potentially detectable
+[184:04] Processing...
+[184:31] RT window set to 7.47471
+[184:32] Recommended MS1 mass accuracy setting: 4.9081 ppm
+[189:41] Removing low confidence identifications
+[191:26] Precursors at 1% peptidoform FDR: 92863
+[191:28] Removing interfering precursors
+[191:37] Training neural networks: 162623 targets, 114495 decoys
+[191:51] Number of IDs at 0.01 FDR: 111391
+[192:09] Precursors at 1% peptidoform FDR: 89240
+[192:11] Calculating protein q-values
+[192:11] Number of genes identified at 1% FDR: 7826 (precursor-level), 7033 (protein-level) (inference performed using proteotypic peptides only)
+[192:11] Quantification
+[192:12] Precursors with monitored PTMs at 1% FDR: 827 out of 27103 considered
+[192:12] Unmodified precursors with monitored PTM sites at 1% FDR: 19995
+[192:13] Precursors with PTMs localised (when required) with > 90% confidence: 815 out of 827
+[192:14] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-14.mzML.quant
+
+[192:15] File #15/16
+[192:15] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-15.mzML
+[192:51] 5965774 library precursors are potentially detectable
+[192:58] Processing...
+[193:18] RT window set to 9.50028
+[193:19] Recommended MS1 mass accuracy setting: 6.01387 ppm
+[198:44] Removing low confidence identifications
+[201:29] Precursors at 1% peptidoform FDR: 80005
+[201:31] Removing interfering precursors
+[201:40] Training neural networks: 143080 targets, 100107 decoys
+[201:50] Number of IDs at 0.01 FDR: 99295
+[202:01] Precursors at 1% peptidoform FDR: 81960
+[202:03] Calculating protein q-values
+[202:04] Number of genes identified at 1% FDR: 7401 (precursor-level), 6658 (protein-level) (inference performed using proteotypic peptides only)
+[202:04] Quantification
+[202:05] Precursors with monitored PTMs at 1% FDR: 1016 out of 24766 considered
+[202:05] Unmodified precursors with monitored PTM sites at 1% FDR: 18487
+[202:05] Precursors with PTMs localised (when required) with > 90% confidence: 1005 out of 1016
+[202:07] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-15.mzML.quant
+
+[202:07] File #16/16
+[202:07] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-16.mzML
+[202:44] 5965774 library precursors are potentially detectable
+[202:49] Processing...
+[203:26] RT window set to 7.6228
+[203:27] Recommended MS1 mass accuracy setting: 5.02563 ppm
+[206:56] Removing low confidence identifications
+[208:26] Precursors at 1% peptidoform FDR: 84361
+[208:28] Removing interfering precursors
+[208:37] Training neural networks: 154006 targets, 108109 decoys
+[208:47] Number of IDs at 0.01 FDR: 102924
+[208:59] Precursors at 1% peptidoform FDR: 83168
+[209:00] Calculating protein q-values
+[209:00] Number of genes identified at 1% FDR: 7625 (precursor-level), 6831 (protein-level) (inference performed using proteotypic peptides only)
+[209:01] Quantification
+[209:01] Precursors with monitored PTMs at 1% FDR: 889 out of 25158 considered
+[209:01] Unmodified precursors with monitored PTM sites at 1% FDR: 18572
+[209:01] Precursors with PTMs localised (when required) with > 90% confidence: 883 out of 889
+[209:02] Quantification information saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-16.mzML.quant
+
+[209:03] Cross-run analysis
+[209:03] Reading quantification information: 16 files
+[209:19] Quantifying peptides
+[210:37] Assembling protein groups
+[210:40] Quantifying proteins
+[210:41] Calculating q-values for protein and gene groups
+[210:47] Calculating global q-values for protein and gene groups
+[210:47] Protein groups with global q-value <= 0.01: 7603
+[210:57] Compressed report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report-first-pass.parquet. Use R 'arrow' or Python 'PyArrow' package to process
+[210:57] Writing report
+[212:21] Report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report-first-pass.tsv.
+[212:21] Saving precursor levels matrix
+[212:22] Precursor levels matrix (1% precursor and protein group FDR) saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report-first-pass.pr_matrix.tsv.
+[212:22] Stats report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report-first-pass.stats.tsv
+[212:22] Generating spectral library:
+[212:22] Saving spectral library to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\1.tsv
+[212:46] 132932 target and 1454 decoy precursors saved
+
+[212:50] Loading spectral library D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\1.tsv
+[213:02] Spectral library loaded: 9282 protein isoforms, 9196 protein groups and 134386 precursors in 111361 elution groups.
+[213:02] Loading protein annotations from FASTA D:\Project\2026Q1\ZP\uniprotkb_taxonomy_id_9606_AND_reviewed_2024_11_11.fasta
+[213:03] Annotating library proteins with information from the FASTA database
+[213:03] Gene names missing for some isoforms
+[213:03] Library contains 9282 proteins, and 9269 genes
+[213:03] [213:03] [213:41] [213:53] [213:54] [213:54] Saving the library to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\1.predicted.speclib
+[213:55] Initialising library
+
+
+Second pass: using the newly created spectral library to reanalyse the data
+
+[213:56] File #1/16
+[213:56] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-01.mzML
+[214:23] 132932 library precursors are potentially detectable
+[214:23] Processing...
+[214:24] RT window set to 5.76328
+[214:24] Recommended MS1 mass accuracy setting: 5.4318 ppm
+[214:32] Removing low confidence identifications
+[214:35] Precursors at 1% peptidoform FDR: 75856
+[214:35] Removing interfering precursors
+[214:37] Training neural networks: 94157 targets, 54376 decoys
+[214:43] Number of IDs at 0.01 FDR: 95622
+[214:52] Precursors at 1% peptidoform FDR: 85157
+[214:52] Calculating protein q-values
+[214:52] Number of genes identified at 1% FDR: 7192 (precursor-level), 6672 (protein-level) (inference performed using proteotypic peptides only)
+[214:52] Quantification
+[214:52] Precursors with monitored PTMs at 1% FDR: 1064 out of 23333 considered
+[214:52] Unmodified precursors with monitored PTM sites at 1% FDR: 19756
+[214:52] Precursors with PTMs localised (when required) with > 90% confidence: 1050 out of 1064
+
+[214:53] File #2/16
+[214:53] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-02.mzML
+[215:13] 132932 library precursors are potentially detectable
+[215:13] Processing...
+[215:14] RT window set to 6.02618
+[215:14] Recommended MS1 mass accuracy setting: 8.33028 ppm
+[215:20] Removing low confidence identifications
+[215:22] Precursors at 1% peptidoform FDR: 73896
+[215:22] Removing interfering precursors
+[215:23] Training neural networks: 94884 targets, 54845 decoys
+[215:27] Number of IDs at 0.01 FDR: 93346
+[215:35] Precursors at 1% peptidoform FDR: 82703
+[215:35] Calculating protein q-values
+[215:35] Number of genes identified at 1% FDR: 7172 (precursor-level), 6626 (protein-level) (inference performed using proteotypic peptides only)
+[215:35] Quantification
+[215:35] Precursors with monitored PTMs at 1% FDR: 956 out of 18755 considered
+[215:35] Unmodified precursors with monitored PTM sites at 1% FDR: 15870
+[215:35] Precursors with PTMs localised (when required) with > 90% confidence: 944 out of 956
+
+[215:36] File #3/16
+[215:36] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-03.mzML
+[215:56] 132932 library precursors are potentially detectable
+[215:56] Processing...
+[215:57] RT window set to 5.86359
+[215:57] Recommended MS1 mass accuracy setting: 6.07458 ppm
+[216:03] Removing low confidence identifications
+[216:05] Precursors at 1% peptidoform FDR: 76868
+[216:06] Removing interfering precursors
+[216:06] Training neural networks: 95264 targets, 55038 decoys
+[216:10] Number of IDs at 0.01 FDR: 95757
+[216:23] Precursors at 1% peptidoform FDR: 84434
+[216:23] Calculating protein q-values
+[216:23] Number of genes identified at 1% FDR: 7202 (precursor-level), 6663 (protein-level) (inference performed using proteotypic peptides only)
+[216:23] Quantification
+[216:24] Precursors with monitored PTMs at 1% FDR: 961 out of 20951 considered
+[216:24] Unmodified precursors with monitored PTM sites at 1% FDR: 17408
+[216:24] Precursors with PTMs localised (when required) with > 90% confidence: 949 out of 961
+
+[216:24] File #4/16
+[216:24] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-04.mzML
+[216:53] 132932 library precursors are potentially detectable
+[216:53] Processing...
+[216:54] RT window set to 5.76691
+[216:54] Recommended MS1 mass accuracy setting: 8.96382 ppm
+[217:06] Removing low confidence identifications
+[217:09] Precursors at 1% peptidoform FDR: 84460
+[217:10] Removing interfering precursors
+[217:11] Training neural networks: 98016 targets, 56071 decoys
+[217:19] Number of IDs at 0.01 FDR: 103364
+[217:34] Precursors at 1% peptidoform FDR: 90564
+[217:34] Calculating protein q-values
+[217:35] Number of genes identified at 1% FDR: 7446 (precursor-level), 6931 (protein-level) (inference performed using proteotypic peptides only)
+[217:35] Quantification
+[217:35] Precursors with monitored PTMs at 1% FDR: 1065 out of 24626 considered
+[217:35] Unmodified precursors with monitored PTM sites at 1% FDR: 20641
+[217:35] Precursors with PTMs localised (when required) with > 90% confidence: 1049 out of 1065
+
+[217:35] File #5/16
+[217:35] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-05.mzML
+[218:00] 132932 library precursors are potentially detectable
+[218:00] Processing...
+[218:02] RT window set to 5.96297
+[218:02] Recommended MS1 mass accuracy setting: 5.28646 ppm
+[218:06] Removing low confidence identifications
+[218:07] Precursors at 1% peptidoform FDR: 50689
+[218:07] Removing interfering precursors
+[218:08] Training neural networks: 68131 targets, 39934 decoys
+[218:10] Number of IDs at 0.01 FDR: 63636
+[218:16] Precursors at 1% peptidoform FDR: 57520
+[218:16] Calculating protein q-values
+[218:16] Number of genes identified at 1% FDR: 6066 (precursor-level), 5499 (protein-level) (inference performed using proteotypic peptides only)
+[218:16] Quantification
+[218:16] Precursors with monitored PTMs at 1% FDR: 830 out of 16453 considered
+[218:16] Unmodified precursors with monitored PTM sites at 1% FDR: 14109
+[218:16] Precursors with PTMs localised (when required) with > 90% confidence: 820 out of 830
+
+[218:17] File #6/16
+[218:17] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-06.mzML
+[218:35] 132932 library precursors are potentially detectable
+[218:35] Processing...
+[218:36] RT window set to 6.06781
+[218:36] Recommended MS1 mass accuracy setting: 5.53444 ppm
+[218:40] Removing low confidence identifications
+[218:41] Precursors at 1% peptidoform FDR: 49909
+[218:41] Removing interfering precursors
+[218:42] Training neural networks: 69493 targets, 41267 decoys
+[218:45] Number of IDs at 0.01 FDR: 63396
+[218:51] Precursors at 1% peptidoform FDR: 57124
+[218:51] Calculating protein q-values
+[218:51] Number of genes identified at 1% FDR: 6006 (precursor-level), 5426 (protein-level) (inference performed using proteotypic peptides only)
+[218:51] Quantification
+[218:51] Precursors with monitored PTMs at 1% FDR: 795 out of 16589 considered
+[218:51] Unmodified precursors with monitored PTM sites at 1% FDR: 14178
+[218:51] Precursors with PTMs localised (when required) with > 90% confidence: 787 out of 795
+
+[218:51] File #7/16
+[218:51] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-07.mzML
+[219:11] 132932 library precursors are potentially detectable
+[219:11] Processing...
+[219:12] RT window set to 6.58372
+[219:12] Recommended MS1 mass accuracy setting: 4.82973 ppm
+[219:21] Removing low confidence identifications
+[219:24] Precursors at 1% peptidoform FDR: 78809
+[219:25] Removing interfering precursors
+[219:26] Training neural networks: 95597 targets, 55225 decoys
+[219:32] Number of IDs at 0.01 FDR: 98703
+[219:44] Precursors at 1% peptidoform FDR: 87703
+[219:44] Calculating protein q-values
+[219:44] Number of genes identified at 1% FDR: 7302 (precursor-level), 6731 (protein-level) (inference performed using proteotypic peptides only)
+[219:45] Quantification
+[219:45] Precursors with monitored PTMs at 1% FDR: 1035 out of 24653 considered
+[219:45] Unmodified precursors with monitored PTM sites at 1% FDR: 20758
+[219:45] Precursors with PTMs localised (when required) with > 90% confidence: 1025 out of 1035
+
+[219:46] File #8/16
+[219:46] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-08.mzML
+[220:11] 132932 library precursors are potentially detectable
+[220:11] Processing...
+[220:12] RT window set to 5.88155
+[220:12] Recommended MS1 mass accuracy setting: 4.97923 ppm
+[220:20] Removing low confidence identifications
+[220:23] Precursors at 1% peptidoform FDR: 83770
+[220:23] Removing interfering precursors
+[220:25] Training neural networks: 98102 targets, 56333 decoys
+[220:30] Number of IDs at 0.01 FDR: 102861
+[220:44] Precursors at 1% peptidoform FDR: 90524
+[220:44] Calculating protein q-values
+[220:44] Number of genes identified at 1% FDR: 7454 (precursor-level), 6828 (protein-level) (inference performed using proteotypic peptides only)
+[220:44] Quantification
+[220:44] Precursors with monitored PTMs at 1% FDR: 1069 out of 25207 considered
+[220:44] Unmodified precursors with monitored PTM sites at 1% FDR: 21332
+[220:44] Precursors with PTMs localised (when required) with > 90% confidence: 1052 out of 1069
+
+[220:45] File #9/16
+[220:45] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-09.mzML
+[221:11] 132932 library precursors are potentially detectable
+[221:11] Processing...
+[221:12] RT window set to 6.08334
+[221:12] Recommended MS1 mass accuracy setting: 5.17889 ppm
+[221:20] Removing low confidence identifications
+[221:23] Precursors at 1% peptidoform FDR: 83298
+[221:23] Removing interfering precursors
+[221:25] Training neural networks: 97903 targets, 56035 decoys
+[221:30] Number of IDs at 0.01 FDR: 103847
+[221:43] Precursors at 1% peptidoform FDR: 90872
+[221:43] Calculating protein q-values
+[221:43] Number of genes identified at 1% FDR: 7496 (precursor-level), 6848 (protein-level) (inference performed using proteotypic peptides only)
+[221:43] Quantification
+[221:43] Precursors with monitored PTMs at 1% FDR: 1123 out of 25354 considered
+[221:43] Unmodified precursors with monitored PTM sites at 1% FDR: 21215
+[221:43] Precursors with PTMs localised (when required) with > 90% confidence: 1103 out of 1123
+
+[221:44] File #10/16
+[221:44] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-10.mzML
+[222:11] 132932 library precursors are potentially detectable
+[222:12] Processing...
+[222:13] RT window set to 5.75172
+[222:13] Recommended MS1 mass accuracy setting: 5.41213 ppm
+[222:21] Removing low confidence identifications
+[222:25] Precursors at 1% peptidoform FDR: 87405
+[222:25] Removing interfering precursors
+[222:27] Training neural networks: 98515 targets, 56361 decoys
+[222:33] Number of IDs at 0.01 FDR: 105443
+[222:47] Precursors at 1% peptidoform FDR: 92361
+[222:47] Calculating protein q-values
+[222:47] Number of genes identified at 1% FDR: 7511 (precursor-level), 6924 (protein-level) (inference performed using proteotypic peptides only)
+[222:47] Quantification
+[222:47] Precursors with monitored PTMs at 1% FDR: 1082 out of 25650 considered
+[222:47] Unmodified precursors with monitored PTM sites at 1% FDR: 21790
+[222:47] Precursors with PTMs localised (when required) with > 90% confidence: 1065 out of 1082
+
+[222:47] File #11/16
+[222:47] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-11.mzML
+[223:07] 132932 library precursors are potentially detectable
+[223:07] Processing...
+[223:08] RT window set to 5.53841
+[223:08] Recommended MS1 mass accuracy setting: 5.285 ppm
+[223:13] Removing low confidence identifications
+[223:15] Precursors at 1% peptidoform FDR: 77550
+[223:15] Removing interfering precursors
+[223:16] Training neural networks: 94664 targets, 54473 decoys
+[223:20] Number of IDs at 0.01 FDR: 97776
+[223:29] Precursors at 1% peptidoform FDR: 86842
+[223:29] Calculating protein q-values
+[223:29] Number of genes identified at 1% FDR: 7263 (precursor-level), 6725 (protein-level) (inference performed using proteotypic peptides only)
+[223:29] Quantification
+[223:29] Precursors with monitored PTMs at 1% FDR: 1040 out of 24397 considered
+[223:29] Unmodified precursors with monitored PTM sites at 1% FDR: 20719
+[223:29] Precursors with PTMs localised (when required) with > 90% confidence: 1026 out of 1040
+
+[223:29] File #12/16
+[223:29] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-12.mzML
+[223:48] 132932 library precursors are potentially detectable
+[223:48] Processing...
+[223:49] RT window set to 5.91726
+[223:49] Recommended MS1 mass accuracy setting: 5.26365 ppm
+[223:54] Removing low confidence identifications
+[223:56] Precursors at 1% peptidoform FDR: 85495
+[223:57] Removing interfering precursors
+[223:58] Training neural networks: 98713 targets, 56476 decoys
+[224:01] Number of IDs at 0.01 FDR: 104817
+[224:11] Precursors at 1% peptidoform FDR: 92509
+[224:11] Calculating protein q-values
+[224:11] Number of genes identified at 1% FDR: 7499 (precursor-level), 6873 (protein-level) (inference performed using proteotypic peptides only)
+[224:11] Quantification
+[224:11] Precursors with monitored PTMs at 1% FDR: 1108 out of 25725 considered
+[224:11] Unmodified precursors with monitored PTM sites at 1% FDR: 21840
+[224:11] Precursors with PTMs localised (when required) with > 90% confidence: 1094 out of 1108
+
+[224:12] File #13/16
+[224:12] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-13.mzML
+[224:38] 132932 library precursors are potentially detectable
+[224:38] Processing...
+[224:39] RT window set to 5.86628
+[224:39] Recommended MS1 mass accuracy setting: 5.18161 ppm
+[224:47] Removing low confidence identifications
+[224:50] Precursors at 1% peptidoform FDR: 85781
+[224:50] Removing interfering precursors
+[224:52] Training neural networks: 98642 targets, 56476 decoys
+[225:01] Number of IDs at 0.01 FDR: 105347
+[225:15] Precursors at 1% peptidoform FDR: 92894
+[225:15] Calculating protein q-values
+[225:15] Number of genes identified at 1% FDR: 7470 (precursor-level), 6900 (protein-level) (inference performed using proteotypic peptides only)
+[225:15] Quantification
+[225:16] Precursors with monitored PTMs at 1% FDR: 1126 out of 25515 considered
+[225:16] Unmodified precursors with monitored PTM sites at 1% FDR: 21816
+[225:16] Precursors with PTMs localised (when required) with > 90% confidence: 1117 out of 1126
+
+[225:16] File #14/16
+[225:16] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-14.mzML
+[225:41] 132932 library precursors are potentially detectable
+[225:41] Processing...
+[225:42] RT window set to 5.72455
+[225:42] Recommended MS1 mass accuracy setting: 8.0823 ppm
+[225:47] Removing low confidence identifications
+[225:50] Precursors at 1% peptidoform FDR: 90770
+[225:50] Removing interfering precursors
+[225:51] Training neural networks: 99851 targets, 56876 decoys
+[225:55] Number of IDs at 0.01 FDR: 109120
+[226:04] Precursors at 1% peptidoform FDR: 95394
+[226:04] Calculating protein q-values
+[226:04] Number of genes identified at 1% FDR: 7671 (precursor-level), 7036 (protein-level) (inference performed using proteotypic peptides only)
+[226:04] Quantification
+[226:04] Precursors with monitored PTMs at 1% FDR: 1080 out of 26495 considered
+[226:04] Unmodified precursors with monitored PTM sites at 1% FDR: 22381
+[226:04] Precursors with PTMs localised (when required) with > 90% confidence: 1066 out of 1080
+
+[226:05] File #15/16
+[226:05] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-15.mzML
+[226:24] 132932 library precursors are potentially detectable
+[226:24] Processing...
+[226:25] RT window set to 5.96168
+[226:25] Recommended MS1 mass accuracy setting: 5.73323 ppm
+[226:33] Removing low confidence identifications
+[226:37] Precursors at 1% peptidoform FDR: 82041
+[226:37] Removing interfering precursors
+[226:39] Training neural networks: 96963 targets, 55830 decoys
+[226:44] Number of IDs at 0.01 FDR: 101626
+[226:56] Precursors at 1% peptidoform FDR: 90408
+[226:56] Calculating protein q-values
+[226:56] Number of genes identified at 1% FDR: 7337 (precursor-level), 6837 (protein-level) (inference performed using proteotypic peptides only)
+[226:56] Quantification
+[226:56] Precursors with monitored PTMs at 1% FDR: 1086 out of 25067 considered
+[226:56] Unmodified precursors with monitored PTM sites at 1% FDR: 21411
+[226:56] Precursors with PTMs localised (when required) with > 90% confidence: 1073 out of 1086
+
+[226:57] File #16/16
+[226:57] Loading run D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\MtoZ-MZJL0304202603-16.mzML
+[227:23] 132932 library precursors are potentially detectable
+[227:23] Processing...
+[227:23] RT window set to 6.32842
+[227:23] Recommended MS1 mass accuracy setting: 4.86377 ppm
+[227:32] Removing low confidence identifications
+[227:35] Precursors at 1% peptidoform FDR: 83007
+[227:35] Removing interfering precursors
+[227:37] Training neural networks: 97066 targets, 55489 decoys
+[227:42] Number of IDs at 0.01 FDR: 103074
+[227:54] Precursors at 1% peptidoform FDR: 89792
+[227:54] Calculating protein q-values
+[227:55] Number of genes identified at 1% FDR: 7504 (precursor-level), 6918 (protein-level) (inference performed using proteotypic peptides only)
+[227:55] Quantification
+[227:55] Precursors with monitored PTMs at 1% FDR: 1078 out of 25115 considered
+[227:55] Unmodified precursors with monitored PTM sites at 1% FDR: 21094
+[227:55] Precursors with PTMs localised (when required) with > 90% confidence: 1067 out of 1078
+
+[227:55] Cross-run analysis
+[227:55] Reading quantification information: 16 files
+[228:01] Quantifying peptides
+[239:27] Quantification parameters: 0.285156, 0.000869909, 0.00029495, 0.0937579, 0.0137221, 0.013971, 0.129295, 0.0148603, 0.0143617, 0.0155394, 0.0364652, 0.0192584, 0.147891, 0.0505817, 0.0545557, 0.0203927
+[240:17] Quantifying proteins
+[240:19] Calculating q-values for protein and gene groups
+[240:20] Calculating global q-values for protein and gene groups
+[240:20] Protein groups with global q-value <= 0.01: 7455
+[240:29] Compressed report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.parquet. Use R 'arrow' or Python 'PyArrow' package to process
+[240:29] Writing report
+[241:48] Report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.tsv.
+[241:48] Saving precursor levels matrix
+[241:50] Precursor levels matrix (1% precursor and protein group FDR) saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.pr_matrix.tsv.
+[241:50] Saving protein group levels matrix
+[241:50] Protein group levels matrix (1% precursor FDR and protein group FDR) saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.pg_matrix.tsv.
+[241:50] Saving gene group levels matrix
+[241:50] Gene groups levels matrix (1% precursor FDR and protein group FDR) saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.gg_matrix.tsv.
+[241:50] Saving unique genes levels matrix
+[241:50] Unique genes levels matrix (1% precursor FDR and protein group FDR) saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.unique_genes_matrix.tsv.
+[241:50] Stats report saved to D:\Project\2026Q1\ZP\MtoZ-MZJL0304202603\Result\report.stats.tsv
+

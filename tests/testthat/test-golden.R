@@ -1,14 +1,14 @@
-# Golden tests: the engine must reproduce the locked PhD results on the demo data.
-# The demo folder holds the Long-term (stage L) runs only (36 runs; scripts/make_demo_subset.R).
+# Golden tests: the engine must reproduce the locked PhD results on the thesis subset in golden_data/ (gitignored; built by scripts/make_golden_subset.R and make_golden_annotation.R).
+# The folder holds the Long-term (stage L) runs only (36 runs).
 # The Early contrast is checked only when the full 76-run data are present.
-demo <- normalizePath(file.path(testthat::test_path(), "..", "..", "demo_data"), mustWork = FALSE)
-report <- file.path(demo, "report.parquet")
+golden <- normalizePath(file.path(testthat::test_path(), "..", "..", "golden_data"), mustWork = FALSE)
+report <- file.path(golden, "report.parquet")
 
 test_that("the engine reproduces the locked PhD contrasts and rescue counts", {
-  skip_if_not(file.exists(report), "demo data not present")
+  skip_if_not(file.exists(report), "golden data (thesis subset in golden_data/) not present")
   skip_on_cran()
   ds <- import_quant(report)
-  ann <- read_annotation(file.path(demo, "demo_sample_annotation.csv"))
+  ann <- read_annotation(file.path(golden, "demo_sample_annotation.csv"))
   ds <- attach_annotation(ds, ann)
   expect_true(nrow(ds$samples) %in% c(36, 76))
 

@@ -61,12 +61,70 @@ import_quant <- function(path, format = "auto", fasta = NULL, confidence = 0.01,
     lp_message("reading FASTA for protein descriptions")
     ds <- msdap::import_fasta(ds, files = fasta)
   }
+  if (format == "diann") {
+    ann <- tryCatch(diann_report_annotations(path), error = function(e) NULL)
+    ds <- apply_report_annotations(ds, ann)
+  }
   ds$lp_import <- list(
     path = normalizePath(path), format = format,
     fasta = if (length(fasta)) normalizePath(fasta) else character(),
     confidence = confidence, acquisition_mode = ds$acquisition_mode %||% acquisition_mode,
     imported_at = format(Sys.time(), "%Y-%m-%d %H:%M:%S")
   )
+  ds
+}
+
+# Gene symbols and protein names stored in a DIA-NN report (columns Genes, Protein.Names and, in
+# newer versions, First.Protein.Description). MS-DAP does not read them, so without a FASTA every
+# protein would carry only its accession. New in labproteomics (2026-11-05).
+diann_report_annotations <- function(path) {
+  want <- c("Protein.Group", "Genes", "Protein.Names", "First.Protein.Description")
+  ext <- tolower(tools::file_ext(path))
+  if (ext == "parquet") {
+    if (!requireNamespace("arrow", quietly = TRUE)) return(NULL)
+    src <- arrow::open_dataset(path)
+    cols <- intersect(want, names(src))
+    if (!all(c("Protein.Group", "Genes") %in% cols)) return(NULL)
+    tab <- src %>% dplyr::select(dplyr::all_of(cols)) %>% dplyr::distinct() %>% dplyr::collect()
+  } else {
+    hdr <- names(readr::read_tsv(path, n_max = 0, show_col_types = FALSE))
+    cols <- intersect(want, hdr)
+    if (!all(c("Protein.Group", "Genes") %in% cols)) return(NULL)
+    tab <- readr::read_tsv(path, col_select = dplyr::all_of(cols), show_col_types = FALSE,
+                           col_types = readr::cols(.default = "c")) %>% dplyr::distinct()
+  }
+  tab <- tibble::as_tibble(tab)
+  for (col in setdiff(want, names(tab))) tab[[col]] <- NA_character_
+  tab %>% dplyr::mutate(dplyr::across(dplyr::everything(), as.character)) %>%
+    dplyr::distinct(.data$Protein.Group, .keep_all = TRUE)
+}
+
+# Fill the gene symbols and headers of ds$proteins from a report annotation table, only where
+# MS-DAP has nothing better (no FASTA given, or the protein is missing from the FASTA).
+apply_report_annotations <- function(ds, ann) {
+  if (is.null(ann) || !nrow(ann) || is.null(ds$proteins) || !nrow(ds$proteins)) return(ds)
+  prot <- tibble::as_tibble(ds$proteins)
+  m <- match(as.character(prot$protein_id), ann$Protein.Group)
+  genes <- ann$Genes[m]
+  has_gene <- !is.na(genes) & nzchar(genes)
+  if (!"gene_symbols" %in% names(prot)) prot$gene_symbols <- prot$protein_id
+  if (!"gene_symbols_or_id" %in% names(prot)) prot$gene_symbols_or_id <- prot$protein_id
+  if (!"gene_symbol_ucount" %in% names(prot)) prot$gene_symbol_ucount <- 0L
+  if (!"fasta_headers" %in% names(prot)) prot$fasta_headers <- prot$protein_id
+  no_gene <- is.na(prot$gene_symbols) | !nzchar(prot$gene_symbols) | prot$gene_symbols == prot$protein_id
+  fill <- has_gene & no_gene
+  prot$gene_symbols[fill] <- genes[fill]
+  prot$gene_symbols_or_id[fill] <- genes[fill]
+  prot$gene_symbol_ucount[fill] <- lengths(strsplit(genes[fill], ";", fixed = TRUE))
+  desc <- ann$First.Protein.Description[m]
+  nm <- ann$Protein.Names[m]
+  text <- ifelse(!is.na(desc) & nzchar(desc), desc, ifelse(!is.na(nm) & nzchar(nm), nm, NA_character_))
+  hdr <- ifelse(is.na(text), NA_character_, paste(prot$protein_id, text))
+  no_hdr <- is.na(prot$fasta_headers) | !nzchar(prot$fasta_headers) | prot$fasta_headers == prot$protein_id
+  fill_h <- !is.na(hdr) & no_hdr
+  prot$fasta_headers[fill_h] <- hdr[fill_h]
+  ds$proteins <- prot
+  ds$lp_report_annotations <- sum(fill)
   ds
 }
 

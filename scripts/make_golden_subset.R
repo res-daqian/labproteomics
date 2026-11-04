@@ -1,4 +1,4 @@
-# Build the demo data: the Long-term (stage L) runs of the PhD DIA-NN report, as a smaller parquet.
+# Build the golden-test data (not the demo): the Long-term (stage L) runs of the PhD DIA-NN report, as a smaller parquet.
 #
 # Why not a plain row filter: MS-DAP removes, at import, every plain peptide sequence that maps to
 # more than one protein group anywhere in the data set. That set depends on which runs are present.
@@ -9,8 +9,8 @@
 # the full import restricted to those runs, so the Long-term results are identical to the thesis.
 #
 # Inputs (read only): the PhD report.parquet and sample_metadata.csv (paths below or as arguments).
-# Outputs (in this project): demo_data/report.parquet, demo_data/_phd_sample_metadata_source.csv.
-# Afterwards run scripts/make_demo_annotation.R to rebuild demo_data/demo_sample_annotation.csv.
+# Outputs (in this project): golden_data/report.parquet, golden_data/_phd_sample_metadata_source.csv.
+# Afterwards run scripts/make_golden_annotation.R to rebuild golden_data/demo_sample_annotation.csv.
 suppressPackageStartupMessages({library(arrow); library(dplyr); library(readr); library(msdap)})
 args <- commandArgs(trailingOnly = TRUE)
 root <- normalizePath(file.path(dirname(sub("^--file=", "", commandArgs()[grep("^--file=", commandArgs())])), ".."))
@@ -18,8 +18,8 @@ phd_inputs <- "/Users/daqian_mbp/Documents/agent_projects/phd-thesis-atropine/da
 src_parquet <- if (length(args) >= 1) args[1] else file.path(phd_inputs, "diann_v231_output_msaccuracy_auto", "report.parquet")
 src_meta <- if (length(args) >= 2) args[2] else file.path(phd_inputs, "sample_metadata.csv")
 keep_stage <- "L"
-out_parquet <- file.path(root, "demo_data", "report.parquet")
-out_meta <- file.path(root, "demo_data", "_phd_sample_metadata_source.csv")
+out_parquet <- file.path(root, "golden_data", "report.parquet")
+out_meta <- file.path(root, "golden_data", "_phd_sample_metadata_source.csv")
 stopifnot(file.exists(src_parquet), file.exists(src_meta))
 
 meta <- read_csv(src_meta, show_col_types = FALSE)
@@ -49,7 +49,7 @@ cat("rows: full", n_before, " stage-L runs", n_runs_only, " after peptide filter
     " (removed", n_runs_only - nrow(rows), "rows of peptides MS-DAP drops as ambiguous or non-best charge state)\n")
 
 # 3. write and replace (demo files are kept read-only)
-tmp <- file.path(root, "demo_data", "report_subset_tmp.parquet")
+tmp <- file.path(root, "golden_data", "report_subset_tmp.parquet")
 write_parquet(rows, tmp)
 if (file.exists(out_parquet)) { Sys.chmod(out_parquet, "644"); stopifnot(file.remove(out_parquet)) }
 stopifnot(file.rename(tmp, out_parquet)); Sys.chmod(out_parquet, "444")

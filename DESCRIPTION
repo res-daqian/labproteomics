@@ -4,8 +4,8 @@ Version: 0.0.1
 Authors@R: person("Daqian", "Lu", email = "res.ludaqian@gmail.com", role = c("aut", "cre"))
 Description: A locally run Shiny application that packages a peptide-level
     label-free proteomics workflow (MS-DAP import, filtering, normalisation,
-    protein roll-up, DEqMS differential analysis, Hallmark GSEA, and a
-    two-contrast rescue classification) with a reproducible run record for
+    protein roll-up, DEqMS differential analysis, gene-set analysis, and an
+    optional two-contrast rescue classification) with a reproducible run record for
     every analysis. The statistical engine is a set of plain R functions that
     can be used without the interface.
 License: MIT + file LICENSE
@@ -38,7 +38,10 @@ Imports:
     fgsea,
     msigdbr,
     rmarkdown,
-    htmltools
+    htmltools,
+    arrow,
+    ragg,
+    systemfonts
 Suggests:
     shinyFiles,
     readxl,
