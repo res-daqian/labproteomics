@@ -91,7 +91,7 @@ rescue_plot <- function(res, label_top = 10) {
   tbl <- tbl[order(tbl$tier), ]
   tbl$label <- ifelse(nzchar(tbl$gene_symbol), tbl$gene_symbol, tbl$protein_id)
   lab <- tbl %>% dplyr::filter(.data$tier == "Tier 1") %>% dplyr::arrange(dplyr::desc(abs(.data$treatment_log2FC))) %>% utils::head(label_top)
-  cols <- c("Tier 1" = LP_RED, "Tier 2" = LP_INK, "Disease-only" = LP_GREY, "Not perturbed" = LP_GREY_PALE)
+  cols <- c("Tier 1" = LP_RED, "Tier 2" = LP_TEAL, "Disease-only" = LP_BROWN, "Not perturbed" = LP_GREY_PALE)
   n1 <- res$counts$n[res$counts$tier == "Tier 1"]; n2 <- res$counts$n[res$counts$tier == "Tier 2"]
   lim <- max(abs(c(tbl$disease_log2FC, tbl$treatment_log2FC)), na.rm = TRUE)
   ggplot2::ggplot(tbl, ggplot2::aes(x = .data$disease_log2FC, y = .data$treatment_log2FC, colour = .data$tier)) +
@@ -102,11 +102,10 @@ rescue_plot <- function(res, label_top = 10) {
     ggplot2::scale_size_manual(values = c("Tier 1" = 1.6, "Tier 2" = 1.3, "Disease-only" = 0.8, "Not perturbed" = 0.5), guide = "none") +
     ggplot2::scale_alpha_manual(values = c("Tier 1" = 1, "Tier 2" = 1, "Disease-only" = 0.8, "Not perturbed" = 0.5), guide = "none") +
     ggplot2::scale_colour_manual(values = cols, breaks = c("Tier 1", "Tier 2", "Disease-only", "Not perturbed")) +
-    ggrepel::geom_text_repel(data = lab, ggplot2::aes(label = .data$label), size = 2.3, colour = LP_INK,
+    ggrepel::geom_text_repel(family = lp_font_family(), data = lab, ggplot2::aes(label = .data$label), size = 2.3, colour = LP_INK,
                              max.overlaps = Inf, box.padding = 0.25, min.segment.length = 0, segment.size = 0.2, show.legend = FALSE) +
     ggplot2::coord_cartesian(xlim = c(-lim, lim), ylim = c(-lim, lim)) +
     theme_lab_proteomics() +
-    ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(
       title = "Disease effect against treatment effect",
       subtitle = sprintf("Tier 1 = %d, Tier 2 = %d | dotted line = complete reversal\ngate: %s", n1, n2, res$gate),

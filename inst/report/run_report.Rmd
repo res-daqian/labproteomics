@@ -21,6 +21,11 @@ fig <- function(name) {
 }
 kable <- function(x, ...) if (!is.null(x) && length(x) && NROW(x)) knitr::kable(x, ...) else invisible(NULL)
 safe_label <- function(x) gsub("[^A-Za-z0-9_-]+", "_", x)
+# p-values and q-values are printed with three significant digits (never rounded to 0)
+fmt_p <- function(df, cols = c("pvalue", "qvalue", "treat_q", "treat_p", "fisher_p", "fisher_q", "pval", "padj", "p_batch", "p_group")) {
+  for (cn in intersect(cols, names(df))) df[[cn]] <- ifelse(is.na(df[[cn]]), NA_character_, formatC(as.numeric(df[[cn]]), format = "g", digits = 3))
+  df
+}
 ```
 
 Created `r s$created`. Folder: `r run_dir`
@@ -63,7 +68,7 @@ cat(sprintf("Flags within %s (%s MAD; identifications below %.0f%% of the median
             if (length(sc$summary$runs_two_or_more)) paste(sc$summary$runs_two_or_more, collapse = ", ") else "none"))
 if (length(sc$summary$batch_differences)) cat(sprintf("Systematic differences between batches (Kruskal-Wallis p < 0.01): %s.\n\n", paste(sc$summary$batch_differences, collapse = "; ")))
 cat("\n\n**Flag rules**\n\n"); print(knitr::kable(sc$rules))
-cat("\n\n**Systematic differences**\n\n"); print(knitr::kable(sc$systematic, digits = 4))
+cat("\n\n**Systematic differences**\n\n"); print(knitr::kable(fmt_p(sc$systematic), digits = 3))
 ```
 
 ```{r, eval = !is.null(s$scorecard), out.width = "100%"}
@@ -125,12 +130,12 @@ for (lab in s$dea$summary$contrast) {
   t <- file.path(run_dir, "tables", paste0("dea_", safe_label(lab), "_hits.csv"))
   if (file.exists(t)) {
     h <- utils::read.csv(t, nrows = 20)
-    if (nrow(h)) { cat("\n\n**First 20 hits** (sorted by p)\n\n"); print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "treat_q", "npep", "loo_n_kept", "loo_n_refits", "loo_fragile"), names(h))], digits = 4)) }
+    if (nrow(h)) { cat("\n\n**First 20 hits** (sorted by p)\n\n"); print(knitr::kable(fmt_p(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "treat_q", "npep", "loo_n_kept", "loo_n_refits", "loo_fragile"), names(h))]), digits = 3)) }
   }
   t2 <- file.path(run_dir, "tables", paste0("dea_", safe_label(lab), "_detection_only.csv"))
   if (file.exists(t2)) {
     h2 <- utils::read.csv(t2, nrows = 15)
-    if (nrow(h2)) { cat("\n\n**Detection-only differences (first 15)**\n\n"); print(knitr::kable(h2[, intersect(c("protein_id", "gene_symbol", "pattern", "n_detected_case", "n_case", "n_detected_control", "n_control", "fisher_p", "fisher_q", "npep_max"), names(h2))], digits = 4)) }
+    if (nrow(h2)) { cat("\n\n**Detection-only differences (first 15)**\n\n"); print(knitr::kable(fmt_p(h2[, intersect(c("protein_id", "gene_symbol", "pattern", "n_detected_case", "n_case", "n_detected_control", "n_control", "fisher_p", "fisher_q", "npep_max"), names(h2))]), digits = 3)) }
   }
 }
 ```
@@ -155,7 +160,7 @@ for (nm in names(s$enrichment)) {
   e <- s$enrichment[[nm]]
   cat(sprintf("\n\n### %s\n\n%s, %s: %d sets tested on %d genes (%d of %d proteins mapped)%s.\n\n", nm, e$method, e$collection, e$n_sets_tested, e$n_genes, e$n_mapped, e$n_total,
               if (!is.null(e$background) && !is.na(e$background)) paste0("; background = ", e$background) else ""))
-  print(knitr::kable(e$top, digits = 4))
+  print(knitr::kable(fmt_p(e$top), digits = 3))
   f <- file.path(run_dir, "figures", paste0("enrichment_", safe_label(nm), ".png"))
   if (file.exists(f)) cat(sprintf("\n\n![](%s){width=80%%}\n\n", f))
 }

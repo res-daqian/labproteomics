@@ -54,6 +54,8 @@ mod_data_server <- function(id, state) {
       fa <- list.files(demo, pattern = "\\.fasta$", full.names = TRUE)
       shiny::updateTextInput(session, "fasta", value = if (length(fa)) fa[[1]] else "")
       shiny::updateTextInput(session, "annot_path", value = file.path(demo, "demo_sample_annotation.csv"))
+      st <- file.path(demo, "demo_settings.json")
+      state$demo_settings <- if (file.exists(st)) tryCatch(jsonlite::read_json(st), error = function(e) NULL) else NULL
     })
 
     shiny::observeEvent(input$import, {
@@ -151,7 +153,7 @@ mod_data_server <- function(id, state) {
 
     output$boxes <- shiny::renderUI({
       ds <- state$ds %||% state$ds_raw
-      if (is.null(ds)) return(empty_state("Import a quantification file to start. The demo button fills in the retina atropine demo data (36 runs, Long-term stage)."))
+      if (is.null(ds)) return(empty_state("Import a quantification file to start. The demo button fills in the public demo data set (PRIDE PXD079891: human endothelial cells, MANCR knockdown against control, 8 donors, 16 runs)."))
       s <- import_summary(ds)
       bslib::layout_columns(
         col_widths = c(3, 3, 3, 3),

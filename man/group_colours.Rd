@@ -14,5 +14,5 @@ group_colours(groups, case = NULL, control = NULL)
 \description{
 If the labels follow the retina study convention (CNT / LIM / LIMA / CNTA, with any stage
 suffix) the semantic mapping is used. Otherwise the case group is red, the control group
-is black and the remaining groups take greys.
+is teal and the remaining groups take the qualitative palette in order.
 }

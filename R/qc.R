@@ -164,14 +164,15 @@ qc_plots <- function(qc) {
   plots <- list()
 
   plots$missingness <- ggplot2::ggplot(sq, ggplot2::aes(x = .data$shortname, y = .data$missing_fraction, fill = .data$group)) +
-    ggplot2::geom_col(width = 0.72) +
+    ggplot2::geom_col(width = 0.55) +
     ggplot2::scale_fill_manual(values = cols) +
     th + ggplot2::labs(x = NULL, y = "Missing fraction", title = "Missing values per run", fill = NULL) +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1, size = 5))
 
   plots$medians <- ggplot2::ggplot(sq, ggplot2::aes(x = .data$group, y = .data$median_log2_intensity, fill = .data$group)) +
-    ggplot2::geom_boxplot(width = 0.6, linewidth = 0.25, outlier.shape = NA) +
-    ggplot2::geom_point(size = 0.9, position = ggplot2::position_jitter(width = 0.12, height = 0, seed = 1)) +
+    ggplot2::geom_boxplot(width = 0.5, linewidth = 0.3, outlier.shape = NA, alpha = 0.45, colour = LP_INK) +
+    ggplot2::geom_point(shape = 21, fill = "white", colour = LP_INK, size = 1.3, stroke = 0.45,
+                        position = ggplot2::position_jitter(width = 0.1, height = 0, seed = 1)) +
     ggplot2::scale_fill_manual(values = cols, guide = "none") +
     th + ggplot2::labs(x = NULL, y = "Median normalised log2 intensity", title = "Intensity centring by group") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, hjust = 1))
@@ -180,13 +181,13 @@ qc_plots <- function(qc) {
   shape_var <- if ("batch" %in% names(pcs) && dplyr::n_distinct(pcs$batch) <= 6 && dplyr::n_distinct(pcs$batch) > 1) "batch" else NULL
   p_pca <- ggplot2::ggplot(pcs, ggplot2::aes(x = .data$PC1, y = .data$PC2, colour = .data$group, label = .data$shortname))
   if (!is.null(shape_var)) {
-    p_pca <- p_pca + ggplot2::geom_point(ggplot2::aes(shape = .data[[shape_var]]), size = 1.8, stroke = 0.4) +
-      ggplot2::scale_shape_manual(values = c(16, 17, 15, 1, 2, 0))
+    p_pca <- p_pca + ggplot2::geom_point(ggplot2::aes(shape = .data[[shape_var]]), size = 1.9, stroke = 0.6) +
+      ggplot2::scale_shape_manual(values = c(21, 24, 22, 16, 17, 15))
   } else {
-    p_pca <- p_pca + ggplot2::geom_point(size = 1.8)
+    p_pca <- p_pca + ggplot2::geom_point(size = 1.9, shape = 21, stroke = 0.7, fill = "white")
   }
   plots$pca <- p_pca +
-    ggrepel::geom_text_repel(size = 2, max.overlaps = 15, box.padding = 0.15, min.segment.length = 0, show.legend = FALSE) +
+    ggrepel::geom_text_repel(family = lp_font_family(), size = 2, max.overlaps = 15, box.padding = 0.15, min.segment.length = 0, show.legend = FALSE) +
     ggplot2::scale_colour_manual(values = cols) +
     th + ggplot2::labs(x = sprintf("PC1 (%.1f%%)", qc$pca_var[[1]]), y = sprintf("PC2 (%.1f%%)", qc$pca_var[[2]]),
                        title = "Principal component analysis", colour = NULL, shape = NULL)
@@ -199,23 +200,24 @@ qc_plots <- function(qc) {
   cor_long$b <- factor(lookup[cor_long$b], levels = rev(ord))
   plots$correlation <- ggplot2::ggplot(cor_long, ggplot2::aes(x = .data$a, y = .data$b, fill = .data$r)) +
     ggplot2::geom_raster() +
-    ggplot2::scale_fill_gradient(low = "white", high = LP_INK, limits = c(min(cor_long$r, na.rm = TRUE), 1)) +
+    scale_fill_lp_cool(limits = c(min(cor_long$r, na.rm = TRUE), 1)) +
     theme_lab_proteomics(base_size = 7) +
     ggplot2::labs(x = NULL, y = NULL, fill = "r", title = "Sample correlation (clustered)") +
     ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 90, vjust = 0.5, hjust = 1, size = 4),
                    axis.text.y = ggplot2::element_text(size = 4))
 
   plots$drift <- ggplot2::ggplot(sq, ggplot2::aes(x = .data$run_order, y = .data$median_log2_intensity, colour = .data$group)) +
-    ggplot2::geom_point(size = 1.6) +
+    ggplot2::geom_point(size = 1.7, shape = 21, stroke = 0.7, fill = "white") +
     { if (nrow(sq) >= 10) ggplot2::geom_smooth(ggplot2::aes(group = 1), method = "loess", formula = y ~ x, se = FALSE,
-                                               linewidth = 0.4, span = 0.75, colour = LP_GREY_DARK) } +
+                                               linewidth = 0.35, span = 0.75, colour = LP_INK) } +
     ggplot2::scale_colour_manual(values = cols) +
     th + ggplot2::labs(x = "Run order", y = "Median normalised log2 intensity", title = "Acquisition drift check", colour = NULL)
 
   if ("batch" %in% names(sq) && dplyr::n_distinct(sq$batch) > 1) {
     plots$batch <- ggplot2::ggplot(sq, ggplot2::aes(x = .data$batch, y = .data$missing_fraction)) +
-      ggplot2::geom_boxplot(width = 0.6, linewidth = 0.25, outlier.shape = NA, fill = LP_GREY_WASH) +
-      ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 0.9, position = ggplot2::position_jitter(width = 0.12, height = 0, seed = 1)) +
+      ggplot2::geom_boxplot(width = 0.5, linewidth = 0.3, outlier.shape = NA, fill = LP_GREY_WASH, colour = LP_INK) +
+      ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.3, shape = 21, stroke = 0.6, fill = "white",
+                          position = ggplot2::position_jitter(width = 0.1, height = 0, seed = 1)) +
       ggplot2::scale_colour_manual(values = cols) +
       th + ggplot2::labs(x = NULL, y = "Missing fraction", title = "Batch structure", colour = NULL) +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, hjust = 1))
@@ -223,16 +225,17 @@ qc_plots <- function(qc) {
 
   if (!is.null(qc$pair_consistency)) {
     plots$pairs <- ggplot2::ggplot(qc$pair_consistency, ggplot2::aes(x = .data$comparison, y = .data$correlation)) +
-      ggplot2::geom_boxplot(width = 0.55, linewidth = 0.25, outlier.shape = NA, fill = LP_GREY_WASH) +
-      ggplot2::geom_point(size = 0.9, position = ggplot2::position_jitter(width = 0.12, height = 0, seed = 1), colour = LP_INK) +
+      ggplot2::geom_boxplot(width = 0.5, linewidth = 0.3, outlier.shape = NA, fill = LP_GREY_WASH, colour = LP_INK) +
+      ggplot2::geom_point(size = 1.3, shape = 21, stroke = 0.5, fill = "white", colour = LP_INK,
+                          position = ggplot2::position_jitter(width = 0.1, height = 0, seed = 1)) +
       th + ggplot2::labs(x = NULL, y = "Within-subject correlation", title = "Within-subject consistency") +
       ggplot2::theme(axis.text.x = ggplot2::element_text(angle = 30, hjust = 1))
   }
 
   od <- sq %>% dplyr::mutate(flagged = ifelse(.data$qc_flag_count > 0, "Flagged", "Not flagged"))
   plots$outliers <- ggplot2::ggplot(od, ggplot2::aes(x = .data$median_correlation, y = .data$missing_fraction, colour = .data$flagged, label = .data$shortname)) +
-    ggplot2::geom_point(size = 1.7) +
-    ggrepel::geom_text_repel(data = od[od$qc_flag_count > 0, ], size = 2.1, max.overlaps = Inf, box.padding = 0.15, show.legend = FALSE) +
+    ggplot2::geom_point(size = 1.8, shape = 21, stroke = 0.7, fill = "white") +
+    ggrepel::geom_text_repel(family = lp_font_family(), data = od[od$qc_flag_count > 0, ], size = 2.1, max.overlaps = Inf, box.padding = 0.15, show.legend = FALSE) +
     ggplot2::scale_colour_manual(values = c("Flagged" = LP_RED, "Not flagged" = LP_GREY)) +
     th + ggplot2::labs(x = "Median correlation with other runs", y = "Missing fraction",
                        title = sprintf("Outlier screen (%d MAD within %s)", qc$params$mad_k, qc$params$flag_strata), colour = NULL)

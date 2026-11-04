@@ -11,13 +11,13 @@ mod_dea_ui <- function(id) {
       shiny::selectInput(ns("pair_by"), "Pair runs by", choices = c("none (unpaired)" = "none")),
       shiny::textInput(ns("label"), "Label (optional)", placeholder = "case_vs_control"),
       shiny::actionButton(ns("add"), "Add contrast", class = "btn-outline-primary w-100 mb-2"),
-      DT::DTOutput(ns("ctable")),
+      DT::DTOutput(ns("ctable"), fill = FALSE),
       shiny::actionButton(ns("remove"), "Remove selected", class = "btn-outline-secondary btn-sm w-100 mt-1"),
       shiny::hr(),
       bslib::accordion(
         open = FALSE,
         bslib::accordion_panel(
-          "Parameters (defaults = retina study)",
+          "Parameters (defaults from the retina study of the PhD project)",
           shiny::numericInput(ns("fc"), "Fold-change threshold", 1.2, min = 1, max = 10, step = 0.05),
           shiny::numericInput(ns("p"), "Significance threshold", 0.05, min = 0.0001, max = 0.5, step = 0.01),
           shiny::radioButtons(ns("gate"), "Gate on",
@@ -37,7 +37,7 @@ mod_dea_ui <- function(id) {
       shiny::actionButton(ns("run"), "Run all contrasts", class = "btn-primary w-100 mt-2")
     ),
     page_header("Differential analysis", "Build the contrasts (paired when the two groups share subjects), run the model, and read every hit with its gate, its per-run values and its leave-one-out stability."),
-    bslib::card(bslib::card_header("Summary"), DT::DTOutput(ns("summary")), shiny::uiOutput(ns("summary_note"))),
+    bslib::card(bslib::card_header("Summary"), DT::DTOutput(ns("summary"), fill = FALSE), shiny::uiOutput(ns("summary_note"))),
     bslib::card(
       bslib::card_header(shiny::div(class = "d-flex align-items-center gap-3", "Contrast", shiny::selectInput(ns("view"), NULL, choices = NULL, width = "320px"))),
       bslib::layout_columns(

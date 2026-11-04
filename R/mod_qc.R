@@ -10,7 +10,7 @@ mod_qc_ui <- function(id) {
       shiny::selectInput(ns("norm"), "Normalisation", choices = norm_choices()),
       shiny::numericInput(ns("mad_k"), "Outlier flag threshold (MADs)", 3, min = 1, max = 6, step = 0.5),
       side_title("Marker panel"),
-      shiny::selectInput(ns("tissue"), "Tissue of the samples", choices = c("Retina" = "retina", "RPE / choroid" = "rpe_choroid", "Sclera" = "sclera", "Tears" = "tears", "Other" = "other")),
+      shiny::selectInput(ns("tissue"), "Tissue of the samples", choices = c("Retina" = "retina", "RPE / choroid" = "rpe_choroid", "Sclera" = "sclera", "Tears" = "tears", "Cultured endothelial cells (HUVEC)" = "cells_endothelial", "Other" = "other")),
       shiny::textInput(ns("panel_path"), "Custom marker panel (CSV: set, gene, role; optional)"),
       shiny::actionButton(ns("run"), "Run QC", class = "btn-primary w-100"),
       shiny::hr(),
@@ -54,6 +54,12 @@ mod_qc_ui <- function(id) {
 
 mod_qc_server <- function(id, state) {
   shiny::moduleServer(id, function(input, output, session) {
+    shiny::observeEvent(state$demo_settings, {
+      tis <- state$demo_settings$tissue
+      valid <- c("retina", "rpe_choroid", "sclera", "tears", "cells_endothelial", "other")
+      if (!is.null(tis) && tis %in% valid) shiny::updateSelectInput(session, "tissue", selected = tis)
+    })
+
     shiny::observeEvent(input$run, {
       if (is.null(state$ds)) { shiny::showNotification("Attach the sample annotation first (page 1).", type = "warning"); return() }
       qc <- tryCatch(
@@ -69,7 +75,7 @@ mod_qc_server <- function(id, state) {
           if (nzchar(pp)) panel <- tryCatch(read_marker_panel(pp), error = function(e) { notify_error("Marker panel", e); NULL })
           mk <- tryCatch(marker_scores(state$ds, tissue = input$tissue, panel = panel, mad_k = input$mad_k),
                          error = function(e) { shiny::showNotification(paste("Marker panel:", conditionMessage(e)), type = "warning"); NULL })
-          shiny::incProgress(0.2, detail = "normalising all runs (about half a minute for the 36 demo runs)")
+          shiny::incProgress(0.2, detail = "normalising all runs (up to a minute for a few dozen runs)")
           q <- qc_global(state$ds, min_peptides = input$min_peptides, norm = input$norm, mad_k = input$mad_k)
           list(qc = q, scorecard = sc, markers = mk)
         }),
@@ -119,6 +125,7 @@ mod_qc_server <- function(id, state) {
       shiny::tagList(
         shiny::p(class = "lp-note mb-1", sprintf("Flags are computed within %s (%s MAD). %d of %d runs have at least one flag; two or more: %s.",
                                                  s$strata, format(sc$params$mad_k), s$n_flagged, s$n_runs, if (length(s$runs_two_or_more)) paste(s$runs_two_or_more, collapse = ", ") else "none")),
+        if (length(s$cohort_notes)) shiny::p(class = "lp-note mb-1", paste(s$cohort_notes, collapse = " ")),
         if (length(s$batch_differences)) shiny::p(class = "lp-note mb-1", sprintf("Systematic differences between batches (Kruskal-Wallis p < 0.01): %s. These are batch effects at the instrument or digestion level, not single bad runs.", paste(s$batch_differences, collapse = "; "))),
         if (length(sc$missing_runs)) shiny::p(class = "lp-note mb-1", sprintf("%d annotated run(s) have no row in the stats file.", length(sc$missing_runs)))
       )
@@ -135,7 +142,7 @@ mod_qc_server <- function(id, state) {
       shiny::req(state$scorecard)
       df <- state$scorecard$table %>% dplyr::select(-dplyr::starts_with("flag_"), -"file_name", -"sample_id")
       dt_compact(df, options = list(pageLength = 10, scrollX = TRUE)) %>%
-        DT::formatStyle("n_flags", target = "row", backgroundColor = DT::styleInterval(c(0.5), c("white", "#FBE3DE")))
+        DT::formatStyle("n_flags", target = "row", backgroundColor = DT::styleInterval(c(0.5), c("white", LP_RED_WASH)))
     })
 
     output$marker_text <- shiny::renderUI({
@@ -189,7 +196,7 @@ mod_qc_server <- function(id, state) {
                                       "flag_intensity_shift", "qc_flag_count")))
       dt_compact(df, options = list(pageLength = 15, scrollX = TRUE)) %>%
         DT::formatRound(c("missing_fraction", "median_log2_intensity", "median_correlation"), 3) %>%
-        DT::formatStyle("qc_flag_count", target = "row", backgroundColor = DT::styleInterval(c(0.5), c("white", "#FBE3DE")))
+        DT::formatStyle("qc_flag_count", target = "row", backgroundColor = DT::styleInterval(c(0.5), c("white", LP_RED_WASH)))
     })
   })
 }

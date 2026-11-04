@@ -15,7 +15,7 @@ mod_enrich_ui <- function(id) {
       shiny::conditionalPanel(sprintf("input['%s'] == 'ORA'", ns("method")),
                               shiny::radioButtons(ns("direction"), "Hits to test", choices = c("up and down together" = "both", "up only" = "up", "down only" = "down"), inline = TRUE)),
       side_title("Mapping"),
-      shiny::checkboxInput(ns("use_map"), "Map protein accessions to human gene symbols with an ortholog table", TRUE),
+      shiny::checkboxInput(ns("use_map"), "Map protein accessions to human gene symbols with an ortholog table (needed for species without human symbols, for example guinea pig)", FALSE),
       shiny::conditionalPanel(
         sprintf("input['%s']", ns("use_map")),
         shiny::fileInput(ns("map_file"), "Upload the ortholog table (protein_accession, human_gene_symbol)", accept = c(".csv", ".tsv", ".txt")),
@@ -44,7 +44,11 @@ mod_enrich_server <- function(id, state) {
   shiny::moduleServer(id, function(input, output, session) {
     demo <- getOption("labproteomics.demo_dir", "")
     demo_map <- if (nzchar(demo)) list.files(demo, pattern = "ortholog.*\\.csv$", full.names = TRUE) else character()
-    if (length(demo_map)) shiny::updateTextInput(session, "map_path", value = demo_map[[1]])
+    if (length(demo_map)) { shiny::updateTextInput(session, "map_path", value = demo_map[[1]]); shiny::updateCheckboxInput(session, "use_map", value = TRUE) }
+    shiny::observeEvent(state$demo_settings, {
+      sp <- state$demo_settings$species
+      if (!is.null(sp)) shiny::updateSelectInput(session, "species", selected = sp)
+    })
 
     shiny::observe({
       nm <- names(state$results)

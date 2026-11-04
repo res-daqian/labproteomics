@@ -120,7 +120,11 @@ run_scorecard <- function(stats, samples = NULL, mad_k = 3, id_fraction = 0.7, m
       } else {
         if (defs$concern[i] %in% c("high", "both")) hi <- mval + mad_k * mad_v
         if (defs$concern[i] %in% c("low", "both")) lo <- mval - mad_k * mad_v
-        if (m == "Average.Missed.Tryptic.Cleavages") hi <- if (is.na(hi)) missed_cleavage_max else min(hi, missed_cleavage_max)
+        # the absolute missed-cleavage limit flags single runs only when the stratum itself digests
+        # well; a cohort whose median is above the limit is reported as a systematic finding instead
+        if (m == "Average.Missed.Tryptic.Cleavages" && !is.na(mval) && mval <= missed_cleavage_max) {
+          hi <- if (is.na(hi)) missed_cleavage_max else min(hi, missed_cleavage_max)
+        }
       }
       med[idx] <- mval; lower[idx] <- lo; upper[idx] <- hi
       flagged[idx] <- !is.na(v[idx]) & ((!is.na(hi) & v[idx] > hi) | (!is.na(lo) & v[idx] < lo))
@@ -132,7 +136,7 @@ run_scorecard <- function(stats, samples = NULL, mad_k = 3, id_fraction = 0.7, m
                   high = sprintf("above the median + %s MAD", format(mad_k)),
                   low = sprintf("below the median - %s MAD", format(mad_k)),
                   both = sprintf("outside the median +/- %s MAD", format(mad_k)))
-      if (m == "Average.Missed.Tryptic.Cleavages") r <- paste0(r, sprintf(" or above %s", format(missed_cleavage_max)))
+      if (m == "Average.Missed.Tryptic.Cleavages") r <- paste0(r, sprintf(" or above %s when the median is below %s", format(missed_cleavage_max), format(missed_cleavage_max)))
       sprintf("%s (within %s)", r, strata_label)
     }
     long[[m]] <- tibble::tibble(metric = m, label = defs$label[i], sample_id = st$sample_id, shortname = st$shortname,
@@ -159,6 +163,14 @@ run_scorecard <- function(stats, samples = NULL, mad_k = 3, id_fraction = 0.7, m
   long <- dplyr::bind_rows(long)
   rules <- dplyr::bind_rows(rules)
   systematic <- dplyr::bind_rows(syst)
+  cohort_notes <- character()
+  if ("Average.Missed.Tryptic.Cleavages" %in% names(st)) {
+    mc <- stats::median(st[["Average.Missed.Tryptic.Cleavages"]], na.rm = TRUE)
+    if (is.finite(mc) && mc > missed_cleavage_max) {
+      cohort_notes <- c(cohort_notes, sprintf("Missed cleavages are above %s in the whole cohort (median %s per peptide): digestion was incomplete in every run, not in single runs.",
+                                              format(missed_cleavage_max), format(signif(mc, 2))))
+    }
+  }
   flag_cols <- grep("^flag_", names(st), value = TRUE)
   st$n_flags <- rowSums(st[, flag_cols, drop = FALSE])
   st$flagged_metrics <- vapply(seq_len(nrow(st)), function(r) {
@@ -172,6 +184,7 @@ run_scorecard <- function(stats, samples = NULL, mad_k = 3, id_fraction = 0.7, m
     summary = list(n_runs = nrow(st), n_flagged = sum(st$n_flags > 0), n_two_or_more = sum(st$n_flags >= 2),
                    runs_two_or_more = st$shortname[st$n_flags >= 2], runs_one = st$shortname[st$n_flags == 1],
                    strata = strata_label,
+                   cohort_notes = cohort_notes,
                    batch_differences = systematic$label[!is.na(systematic$p_batch) & systematic$p_batch < 0.01],
                    group_differences = systematic$label[!is.na(systematic$p_group) & systematic$p_group < 0.01]),
     params = list(mad_k = mad_k, id_fraction = id_fraction, missed_cleavage_max = missed_cleavage_max, min_stratum = min_stratum,
@@ -193,14 +206,14 @@ scorecard_plot <- function(sc, metrics = NULL) {
     ggplot2::geom_line(ggplot2::aes(y = .data$median, group = .data$stratum), linewidth = 0.25, colour = LP_GREY_LIGHT) +
     ggplot2::geom_line(data = d[!is.na(d$upper), ], ggplot2::aes(y = .data$upper, group = .data$stratum), linewidth = 0.25, linetype = "dashed", colour = LP_RED_LIGHT) +
     ggplot2::geom_line(data = d[!is.na(d$lower), ], ggplot2::aes(y = .data$lower, group = .data$stratum), linewidth = 0.25, linetype = "dashed", colour = LP_RED_LIGHT) +
-    ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.1) +
-    ggplot2::geom_point(data = d[d$flagged, ], colour = LP_RED, size = 2.4, shape = 21, stroke = 0.6) +
-    ggrepel::geom_text_repel(data = d[d$flagged, ], ggplot2::aes(label = .data$shortname), size = 1.9, colour = LP_RED,
+    ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.3, shape = 21, stroke = 0.55, fill = "white") +
+    ggplot2::geom_point(data = d[d$flagged, ], colour = LP_RED, size = 2.6, shape = 21, stroke = 0.6) +
+    ggrepel::geom_text_repel(family = lp_font_family(), data = d[d$flagged, ], ggplot2::aes(label = .data$shortname), size = 1.9, colour = LP_RED,
                              max.overlaps = Inf, box.padding = 0.2, min.segment.length = 0, segment.size = 0.2) +
     ggplot2::scale_colour_manual(values = cols) +
     ggplot2::facet_wrap(~ label, scales = "free_y", ncol = 4) +
     theme_lab_proteomics(base_size = 7.5) +
-    ggplot2::theme(legend.position = "bottom", panel.spacing = grid::unit(0.8, "lines")) +
+    ggplot2::theme(panel.spacing = grid::unit(0.9, "lines")) +
     ggplot2::labs(x = "Run order", y = NULL, colour = NULL, title = "Run scorecard (search-engine statistics per run)",
                   subtitle = sprintf("Grey = median within %s; dashed red = flag limits (%s MAD; identifications below %.0f%% of the median)",
                                      sc$params$strata, format(sc$params$mad_k), 100 * sc$params$id_fraction))

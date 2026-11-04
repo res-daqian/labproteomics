@@ -50,6 +50,10 @@ marker_panels <- function() {
     "tear_film", "Tear film proteins",
     c("LYZ", "LTF", "LCN1", "PIP", "AZGP1", "PIGR", "JCHAIN", "LACRT", "PRR4", "SCGB2A1", "SCGB1D1", "ZG16B", "PROL1", "OPRPN", "DMBT1", "CST4", "CST1"),
     "Major lacrimal proteins; expected in tears.",
+    "endothelial", "Endothelial cells",
+    c("PECAM1", "CDH5", "VWF", "KDR", "FLT1", "TEK", "TIE1", "ENG", "ESAM", "CLDN5", "ICAM2", "MCAM", "ROBO4", "EMCN", "PLVAP",
+      "CD34", "ERG", "FLI1", "NOS3", "THBD", "SELE", "ANGPT2", "CALCRL", "EDN1", "MMRN1", "MMRN2", "ECSCR", "S1PR1", "ACKR1", "CAV1"),
+    "Vascular endothelial proteins; expected in endothelial cultures (HUVEC) and in vascular tissue such as the choroid.",
     "y_linked", "Y-chromosome proteins (sex check)",
     c("DDX3Y", "EIF1AY", "KDM5D", "UTY", "RPS4Y1", "USP9Y", "ZFY", "NLGN4Y", "EIF2S3Y"),
     "Detected only in male samples when the reference proteome contains Y-linked genes (human, mouse); use to catch sample swaps."
@@ -57,26 +61,30 @@ marker_panels <- function() {
 }
 
 #' Role of every marker set for a tissue
-#' @param tissue "retina", "rpe_choroid", "sclera", "tears" or "other"
+#' @param tissue "retina", "rpe_choroid", "sclera", "tears", "cells_endothelial" (cultured endothelial
+#'   cells such as HUVEC) or "other"
 #' @return tibble(set, role) with role in expected / neighbour / contamination / check
 #' @export
-marker_roles <- function(tissue = c("retina", "rpe_choroid", "sclera", "tears", "other")) {
+marker_roles <- function(tissue = c("retina", "rpe_choroid", "sclera", "tears", "cells_endothelial", "other")) {
   tissue <- match.arg(tissue)
   sets <- marker_panels()$set
   role <- switch(
     tissue,
     retina = c(photoreceptor = "expected", rpe = "neighbour", lens = "neighbour", blood_cells = "neighbour", plasma = "neighbour",
                ecm_sclera_choroid = "neighbour", smooth_muscle = "neighbour", skeletal_muscle = "contamination",
-               keratin_skin = "contamination", epithelium = "contamination", tear_film = "contamination", y_linked = "check"),
+               keratin_skin = "contamination", epithelium = "contamination", tear_film = "contamination", endothelial = "neighbour", y_linked = "check"),
     rpe_choroid = c(rpe = "expected", ecm_sclera_choroid = "expected", blood_cells = "expected", plasma = "expected",
                     photoreceptor = "neighbour", lens = "contamination", smooth_muscle = "neighbour", skeletal_muscle = "contamination",
-                    keratin_skin = "contamination", epithelium = "contamination", tear_film = "contamination", y_linked = "check"),
+                    keratin_skin = "contamination", epithelium = "contamination", tear_film = "contamination", endothelial = "expected", y_linked = "check"),
     sclera = c(ecm_sclera_choroid = "expected", rpe = "neighbour", photoreceptor = "neighbour", blood_cells = "neighbour", plasma = "neighbour",
                smooth_muscle = "neighbour", skeletal_muscle = "neighbour", lens = "contamination", keratin_skin = "contamination",
-               epithelium = "neighbour", tear_film = "contamination", y_linked = "check"),
+               epithelium = "neighbour", tear_film = "contamination", endothelial = "neighbour", y_linked = "check"),
     tears = c(tear_film = "expected", plasma = "neighbour", blood_cells = "neighbour", epithelium = "neighbour", keratin_skin = "contamination",
               photoreceptor = "contamination", rpe = "contamination", lens = "contamination", ecm_sclera_choroid = "contamination",
-              smooth_muscle = "contamination", skeletal_muscle = "contamination", y_linked = "check"),
+              smooth_muscle = "contamination", skeletal_muscle = "contamination", endothelial = "contamination", y_linked = "check"),
+    cells_endothelial = c(endothelial = "expected", keratin_skin = "contamination", plasma = "check", blood_cells = "check",
+                          smooth_muscle = "neighbour", y_linked = "check", photoreceptor = "check", rpe = "check", lens = "check",
+                          ecm_sclera_choroid = "check", skeletal_muscle = "check", epithelium = "check", tear_film = "check"),
     other = stats::setNames(rep("check", length(sets)), sets)
   )
   tibble::tibble(set = sets, role = unname(role[sets]))
@@ -189,7 +197,7 @@ marker_plot <- function(ms, sets = NULL) {
   d <- d[d$set %in% ms$summary$sets_present, , drop = FALSE]
   short <- c(photoreceptor = "Photoreceptor", rpe = "RPE", lens = "Lens crystallins", blood_cells = "Blood cells", plasma = "Plasma",
              ecm_sclera_choroid = "Sclera / choroid ECM", smooth_muscle = "Smooth muscle", skeletal_muscle = "Skeletal muscle",
-             keratin_skin = "Skin keratins", epithelium = "Surface epithelium", tear_film = "Tear film", y_linked = "Y-linked")
+             keratin_skin = "Skin keratins", epithelium = "Surface epithelium", tear_film = "Tear film", endothelial = "Endothelial", y_linked = "Y-linked")
   role_short <- c(expected = "expected", neighbour = "neighbour", contamination = "contam.", check = "check")
   lab <- ifelse(d$set %in% names(short), short[d$set], strtrim(d$label, 22))
   d$panel_label <- sprintf("%s (%s)", lab, role_short[d$role])
@@ -203,14 +211,14 @@ marker_plot <- function(ms, sets = NULL) {
   ggplot2::ggplot(d, ggplot2::aes(x = .data$run_order, y = .data$pct)) +
     ggplot2::geom_hline(data = bands, ggplot2::aes(yintercept = .data$median), linewidth = 0.25, colour = LP_GREY_LIGHT) +
     ggplot2::geom_hline(data = bands, ggplot2::aes(yintercept = .data$limit), linewidth = 0.25, linetype = "dashed", colour = LP_RED_LIGHT) +
-    ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.1) +
-    ggplot2::geom_point(data = d[d$flagged, ], colour = LP_RED, size = 2.4, shape = 21, stroke = 0.6) +
-    ggrepel::geom_text_repel(data = d[d$flagged, ], ggplot2::aes(label = .data$shortname), size = 1.9, colour = LP_RED,
+    ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.3, shape = 21, stroke = 0.55, fill = "white") +
+    ggplot2::geom_point(data = d[d$flagged, ], colour = LP_RED, size = 2.6, shape = 21, stroke = 0.6) +
+    ggrepel::geom_text_repel(family = lp_font_family(), data = d[d$flagged, ], ggplot2::aes(label = .data$shortname), size = 1.9, colour = LP_RED,
                              max.overlaps = Inf, box.padding = 0.2, min.segment.length = 0, segment.size = 0.2) +
     ggplot2::scale_colour_manual(values = cols) +
     ggplot2::facet_wrap(~ panel_label, scales = "free_y", ncol = 4) +
     theme_lab_proteomics(base_size = 7.5) +
-    ggplot2::theme(legend.position = "bottom", panel.spacing = grid::unit(0.8, "lines")) +
+    ggplot2::theme(panel.spacing = grid::unit(0.9, "lines")) +
     ggplot2::labs(x = "Run order", y = "Share of total ion signal (%)", colour = NULL,
                   title = sprintf("Tissue purity and contamination markers (tissue: %s)", ms$tissue),
                   subtitle = sprintf("Grey = median; dashed red = flag limit (%s MAD). Expected sets are flagged when low, the others when high.", format(ms$params$mad_k)))

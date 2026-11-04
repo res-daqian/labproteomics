@@ -190,13 +190,12 @@ gsea_plot <- function(gsea, top = 20, padj_threshold = 0.05) {
                                TRUE ~ "Not significant")
     ) %>% dplyr::arrange(.data$NES)
   tbl$label <- factor(tbl$label, levels = unique(tbl$label))
-  cols <- c("Positive (padj < threshold)" = LP_RED, "Negative (padj < threshold)" = LP_INK, "Not significant" = LP_GREY_PALE)
+  cols <- c("Positive (padj < threshold)" = LP_DIVERGING[1], "Negative (padj < threshold)" = LP_DIVERGING[5], "Not significant" = LP_GREY_PALE)
   ggplot2::ggplot(tbl, ggplot2::aes(x = .data$NES, y = .data$label, fill = .data$class)) +
-    ggplot2::geom_col(width = 0.7) +
-    ggplot2::geom_vline(xintercept = 0, linewidth = 0.3, colour = LP_INK) +
+    ggplot2::geom_col(width = 0.55) +
+    ggplot2::geom_vline(xintercept = 0, linewidth = 0.25, colour = LP_INK) +
     ggplot2::scale_fill_manual(values = cols) +
     theme_lab_proteomics() +
-    ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(x = "Normalised enrichment score", y = NULL, fill = NULL,
                   title = sprintf("%s GSEA (top %d of %d sets)", gsea$collection, nrow(tbl), gsea$n_sets_tested),
                   subtitle = sprintf("%d ranked genes (%d of %d proteins mapped); ranking = %s", gsea$n_genes, gsea$n_mapped, gsea$n_total, gsea$params$ranking))
@@ -214,12 +213,11 @@ ora_plot <- function(ora, top = 20, padj_threshold = 0.05) {
     dplyr::arrange(.data$neglog)
   tbl$label <- factor(tbl$label, levels = unique(tbl$label))
   ggplot2::ggplot(tbl, ggplot2::aes(x = .data$neglog, y = .data$label, fill = .data$class)) +
-    ggplot2::geom_col(width = 0.7) +
-    ggplot2::geom_text(ggplot2::aes(label = sprintf("%d/%d", .data$overlap, .data$size)), hjust = -0.15, size = 2.2, colour = LP_INK) +
+    ggplot2::geom_col(width = 0.55) +
+    ggplot2::geom_text(family = lp_font_family(), ggplot2::aes(label = sprintf("%d/%d", .data$overlap, .data$size)), hjust = -0.15, size = 2.2, colour = LP_INK) +
     ggplot2::scale_fill_manual(values = c("padj < threshold" = LP_RED, "Not significant" = LP_GREY_PALE)) +
     ggplot2::scale_x_continuous(expand = ggplot2::expansion(mult = c(0, 0.18))) +
     theme_lab_proteomics() +
-    ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(x = "-log10 p (hypergeometric)", y = NULL, fill = NULL,
                   title = sprintf("%s ORA, %s hits (top %d of %d sets)", ora$collection, ora$direction, nrow(tbl), ora$n_sets_tested),
                   subtitle = sprintf("%d hit genes against a background of %s; labels = overlap/set size", ora$n_genes, ora$background))

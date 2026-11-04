@@ -16,5 +16,6 @@ save_figure(plot, path_no_ext, width = 6, height = 4.5, dpi = 200)
 \item{dpi}{raster resolution for the PNG}
 }
 \description{
-Save a ggplot as PDF and PNG side by side
+The PDF is written with the cairo device so that the figure font (Arial) is embedded; the
+PNG uses ragg when it is installed. Both fall back to the base devices.
 }

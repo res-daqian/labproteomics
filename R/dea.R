@@ -239,10 +239,9 @@ volcano_plot <- function(result, label_top = 12, highlight = NULL) {
   if (!is.null(hl) && nrow(hl)) g <- g + ggplot2::geom_point(data = hl, colour = LP_RED, size = 1.6, shape = 21, stroke = 0.6)
   loo_text <- if (has_loo && !is.null(result$loo)) sprintf("; hollow = fragile in leave-one-out (%d)", result$loo$n_fragile) else ""
   g +
-    ggrepel::geom_text_repel(data = lab, ggplot2::aes(label = .data$label), size = 2.3, max.overlaps = Inf,
+    ggrepel::geom_text_repel(family = lp_font_family(), data = lab, ggplot2::aes(label = .data$label), size = 2.3, max.overlaps = Inf,
                              box.padding = 0.25, min.segment.length = 0, colour = LP_INK, segment.size = 0.2) +
     theme_lab_proteomics() +
-    ggplot2::theme(legend.position = "bottom") +
     ggplot2::labs(
       title = sprintf("%s vs %s", sp$case, sp$control),
       subtitle = sprintf("%s | %s | n = %d vs %d\n%d of %d proteins pass %s%s",
@@ -269,9 +268,9 @@ protein_profile_plot <- function(result, protein_id) {
   g <- ggplot2::ggplot(df, ggplot2::aes(x = .data$group, y = .data$value))
   if (!is.null(sp$pair_by) && sp$pair_by %in% names(df)) {
     g <- g + ggplot2::geom_line(ggplot2::aes(group = .data[[sp$pair_by]]), colour = LP_GREY_LIGHT, linewidth = 0.3) +
-      ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.8)
+      ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 2, shape = 21, stroke = 0.7, fill = "white")
   } else {
-    g <- g + ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 1.8,
+    g <- g + ggplot2::geom_point(ggplot2::aes(colour = .data$group), size = 2, shape = 21, stroke = 0.7, fill = "white",
                                  position = ggplot2::position_jitter(width = 0.08, height = 0, seed = 1))
   }
   title <- if (nzchar(row$gene_symbol)) sprintf("%s (%s)", row$gene_symbol, protein_id) else protein_id
@@ -280,7 +279,7 @@ protein_profile_plot <- function(result, protein_id) {
     sprintf("\nleave-one-out: kept in %d of %d refits%s", row$loo_n_kept, row$loo_n_refits,
             if (isTRUE(row$loo_fragile)) sprintf(" (lost without %s)", row$loo_driver) else "")
   } else ""
-  g + ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.4, linewidth = 0.3, colour = LP_INK) +
+  g + ggplot2::stat_summary(fun = stats::median, geom = "crossbar", width = 0.35, linewidth = 0.3, colour = LP_INK) +
     ggplot2::scale_colour_manual(values = cols, guide = "none") +
     theme_lab_proteomics(base_size = 9) +
     ggplot2::labs(title = title, x = NULL, y = "Normalised log2 intensity",

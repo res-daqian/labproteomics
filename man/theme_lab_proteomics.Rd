@@ -2,15 +2,15 @@
 % Please edit documentation in R/theme.R
 \name{theme_lab_proteomics}
 \alias{theme_lab_proteomics}
-\title{Thin-axis, no-grid ggplot2 theme used for every figure}
+\title{Hairline-axis ggplot2 theme used for every figure}
 \usage{
-theme_lab_proteomics(base_size = 8, base_family = "")
+theme_lab_proteomics(base_size = 8, base_family = lp_font_family())
 }
 \arguments{
 \item{base_size}{font size in points}
 
-\item{base_family}{font family}
+\item{base_family}{font family (default: Arial when available)}
 }
 \description{
-Thin-axis, no-grid ggplot2 theme used for every figure
+Hairline-axis ggplot2 theme used for every figure
 }

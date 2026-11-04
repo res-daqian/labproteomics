@@ -4,10 +4,13 @@
 \alias{marker_roles}
 \title{Role of every marker set for a tissue}
 \usage{
-marker_roles(tissue = c("retina", "rpe_choroid", "sclera", "tears", "other"))
+marker_roles(
+  tissue = c("retina", "rpe_choroid", "sclera", "tears", "cells_endothelial", "other")
+)
 }
 \arguments{
-\item{tissue}{"retina", "rpe_choroid", "sclera", "tears" or "other"}
+\item{tissue}{"retina", "rpe_choroid", "sclera", "tears", "cells_endothelial" (cultured endothelial
+cells such as HUVEC) or "other"}
 }
 \value{
 tibble(set, role) with role in expected / neighbour / contamination / check
