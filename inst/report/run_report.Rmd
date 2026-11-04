@@ -11,7 +11,7 @@ params:
 ---
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = "", results = "asis")
 run_dir <- params$run_dir
 s <- jsonlite::fromJSON(file.path(run_dir, "run_summary.json"), simplifyVector = TRUE)
 fig <- function(name) {
@@ -40,7 +40,7 @@ Created `r s$created`. Folder: `r run_dir`
 | Excluded after QC | `r if (length(s$excluded_after_qc)) paste(s$excluded_after_qc, collapse = ", ") else "none"` |
 
 ```{r}
-kable(s$groups, caption = "Runs per group")
+cat("\n\n**Runs per group**\n\n"); kable(s$groups)
 ```
 
 `r if (is.null(s$qc)) "" else "## Quality control"`
@@ -67,7 +67,7 @@ fig("qc_medians"); fig("qc_pca"); fig("qc_correlation"); fig("qc_drift"); fig("q
 p <- s$dea$params
 cat(sprintf("Filter: >= %d peptides per protein, detected in >= %.0f%% of runs; normalisation %s; roll-up %s; model %s; second engine limma-trend for concordance.\n\n",
             p$min_peptides_per_protein, 100 * p$min_detect_fraction, p$norm, p$rollup, p$dea_algorithm))
-kable(s$dea$summary, digits = 3, caption = "Contrast summary (n_hits uses the stated gate)")
+cat("\n\n**Contrast summary** (n_hits uses the stated gate)\n\n"); kable(s$dea$summary, digits = 3)
 ```
 
 ```{r, eval = !is.null(s$dea), results = "asis"}
@@ -77,7 +77,7 @@ for (lab in s$dea$summary$contrast) {
   t <- file.path(run_dir, "tables", paste0("dea_", gsub("[^A-Za-z0-9_-]+", "_", lab), "_hits.csv"))
   if (file.exists(t)) {
     h <- utils::read.csv(t, nrows = 20)
-    if (nrow(h)) print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "npep"), names(h))], digits = 4, caption = "First 20 hits (sorted by p)"))
+    if (nrow(h)) cat("\n\n**First 20 hits** (sorted by p)\n\n"); print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "npep"), names(h))], digits = 4))
   }
 }
 ```
@@ -87,8 +87,8 @@ for (lab in s$dea$summary$contrast) {
 ```{r, eval = !is.null(s$rescue)}
 cat(sprintf("Disease contrast: %s. Treatment contrast: %s. Drug-only contrast: %s.\n\nGate: %s\n\n",
             s$rescue$labels$disease, s$rescue$labels$treatment, if (is.na(s$rescue$labels$drug)) "none" else s$rescue$labels$drug, s$rescue$gate))
-kable(data.frame(tier = names(s$rescue$definitions), definition = unlist(s$rescue$definitions)), caption = "Definitions")
-kable(s$rescue$counts, caption = "Counts")
+cat("\n\n**Definitions**\n\n"); kable(data.frame(tier = names(s$rescue$definitions), definition = unlist(s$rescue$definitions)))
+cat("\n\n**Counts**\n\n"); kable(s$rescue$counts)
 ```
 
 ```{r, eval = !is.null(s$rescue), out.width = "70%"}

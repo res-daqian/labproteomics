@@ -1,6 +1,6 @@
 # PROGRESS — 当前状态（先读这页）
 
-Last updated: 2026-11-04（第一天）
+Last updated: 2026-11-04 晚（第一天，可演示版本已就绪）
 
 ## 1. 目标与范围
 - 导师要求：把 PhD 的 MS 蛋白组分析流程打包成 **本地运行的 Shiny 应用**，给不写代码的同事用。
@@ -9,9 +9,12 @@ Last updated: 2026-11-04（第一天）
 - demo 数据：PhD Part II 全部 76 个样本（只读克隆到 `demo_data/`），演示走 Long-term 对比。
 
 ## 2. 现在做到哪
-- 包骨架 `labproteomics`（临时名）+ engine 九个文件 + 六页 Shiny 界面已写出。
-- 冒烟测试：导入 7 s；注释校验通过；golden 对比核对中（见 §3）。
-- 未做：安装成包并用浏览器逐页检查；README / 安装说明；launcher；commit。
+- **可演示版本已就绪（2026-11-04）**：包 `labproteomics` 已安装；六页界面用 headless Chrome 按 demo 流程逐页点过、截图检查过（Data → QC → 三个 Long-term 对比 → Rescue → Hallmark GSEA → 运行记录 + HTML 报告），浏览器 console 零错误。
+- 冒烟测试 + golden testthat（12 项）全部通过：四个对比与论文数字完全一致；Long-term rescue Tier 1 = 15、Tier 2 = 180；drug flag 在两层内 = 2。
+- 实测耗时（M4 Pro）：导入 7 s；全量 QC 约 65 s；单个对比 8–20 s；GSEA 2 s；运行记录 + 报告约 6 s。
+- 启动方式：双击 `launch_mac.command`，或 `Rscript scripts/launch_app.R`，或 R 里 `labproteomics::run_app(demo_dir = "demo_data", runs_dir = "runs")`。
+- 演示脚本：`docs/demo_script_CN.md`。
+- 未做：Windows 机器实测（launcher 已写，未验证）；renv；异步计算；Spectronaut / FragPipe 实测数据；GO / Reactome；名字。
 
 ## 3. Golden 数字（必须复现 PhD 锁定结果）
 | 对比 | tested | hits p | hits q | 来源 |
@@ -35,4 +38,4 @@ Last updated: 2026-11-04（第一天）
 | demo 数据 = 全部 76 样本，演示 Long-term | 当前（2026-11-04）；「Early 40 样本子集」作废 |
 
 ## 6. 最近变更
-- 2026-11-04：项目建立；demo 数据克隆；engine + 界面初版；冒烟测试修复 msdap attach 问题。
+- 2026-11-04：项目建立；demo 数据克隆；engine + 界面初版；冒烟测试修复 msdap attach 问题与 group_colours 正则；界面改为非填充布局（图高度正确）、QC 摘要改计数；全流程 headless 检查通过；golden 测试通过；首次 commit。

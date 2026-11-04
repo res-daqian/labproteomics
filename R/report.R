@@ -139,10 +139,11 @@ write_run_record <- function(run_dir, ds, qc = NULL, dea = list(), rescue = NULL
 #' @param run_dir run folder written by [write_run_record()]
 #' @export
 render_run_report <- function(run_dir) {
+  run_dir <- normalizePath(run_dir, mustWork = TRUE)
   if (!rmarkdown::pandoc_available()) stop("pandoc is not available (install RStudio or pandoc).")
   template <- system.file("report", "run_report.Rmd", package = "labproteomics")
   if (!nzchar(template)) template <- file.path("inst", "report", "run_report.Rmd")
   out <- rmarkdown::render(template, output_file = "report.html", output_dir = run_dir,
-                           params = list(run_dir = normalizePath(run_dir)), quiet = TRUE, envir = new.env())
+                           params = list(run_dir = run_dir), quiet = TRUE, envir = new.env())
   normalizePath(out)
 }
