@@ -28,21 +28,27 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
 - Demo data are rebuilt only with `scripts/make_demo_subset.R` followed by
   `scripts/make_demo_annotation.R`. The subset keeps the original row order and only the peptides
   MS-DAP keeps on the full import; both are needed to reproduce the thesis numbers (see
-  `PROVENANCE.md`, section "Demo data").
+  `PROVENANCE.md`, section "Demo data"). `demo_data/report.stats.tsv` (36 rows) and
+  `demo_data/report.log.txt` come from the same PhD input folder and are gitignored too.
+- The git tag `demo-2026-11-06-safe` marks the first demo-ready version (2026-11-04). Keep it.
 
 ## Architecture rules
 
 - **Engine first, interface second.** Everything the interface does is a call to a plain R function
-  in `R/` (`import_quant`, `attach_annotation`, `qc_global`, `run_contrast`, `rescue_classify`,
-  `ranked_genes` + `gsea_hallmark`, `write_run_record`). No statistics in Shiny code.
+  in `R/` (`import_quant`, `attach_annotation`, `design_check`, `run_scorecard`, `marker_scores`,
+  `qc_global`, `run_contrast` (with `detection_differences` and `loo_stability`), `rescue_classify`,
+  `ranked_genes` + `gsea_collection` / `ora_collection`, `export_adapters`, `write_run_record`).
+  No statistics in Shiny code.
 - **Every analysis choice is a parameter** shown in the interface and written to the run record
   (`parameters.json`). No hidden defaults. The PhD defaults are defaults, not constants.
 - **Every run writes a run record** (`runs/<timestamp>_<label>/`): input manifest with MD5,
   annotation, parameters, package versions, session info, tables, figures (PDF + PNG), HTML report.
 - **Honesty in the interface:** a hit is always stated with its verbatim gate
-  (`|log2FC| >= log2(1.2) (= 0.263) AND p < 0.05`); Tier 1 / Tier 2 definitions are printed
-  next to the counts; the drug-only contrast only annotates, never filters; unpaired contrasts
-  are labelled as such.
+  (`|log2FC| >= log2(1.2) (= 0.263) AND p < 0.05`, or the q / treat variant); Tier 1 / Tier 2
+  definitions are printed next to the counts; the drug-only contrast only annotates, never filters;
+  unpaired contrasts are labelled as such; leave-one-out fragility, detection-only differences and
+  treat columns describe the hits and never change them; the ORA background is always the
+  quantified proteins of the contrast.
 - **Figures:** black-grey-red house style (`theme_lab_proteomics`, `group_colours`), thin axes, no grid.
 - **Language:** interface and documents in plain ESL-safe English (no idioms, one idea per
   sentence, define abbreviations). Chat with Daqian in Chinese. `PROGRESS.md` is Chinese.
@@ -61,8 +67,11 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
 
 ## Where things are
 
-- `R/` engine (`utils`, `theme`, `annotation`, `import`, `qc`, `dea`, `rescue`, `enrichment`,
-  `report`) and interface (`app.R`, `mod_*.R`). `inst/report/run_report.Rmd` report template.
+- `R/` engine (`utils`, `theme`, `annotation`, `import`, `design`, `runstats`, `markers`, `qc`,
+  `dea`, `dea_extras`, `rescue`, `enrichment`, `export`, `report`) and interface (`app.R` with the
+  theme and the building blocks `stat_tile`, `page_header`, `msg_list`; `mod_*.R`).
+  `inst/report/run_report.Rmd` report template.
 - `tests/testthat/` unit tests + golden tests. `demo_data/` demo inputs (gitignored large files).
 - `runs/` run records (gitignored). `scripts/` helpers (`launch_app.R`, `make_demo_annotation.R`).
-- `docs/` demo script and notes. `README.md` user guide (Mac / Windows install and start).
+- `docs/` demo script, QC primer for Daqian (`qc_primer_CN.md`) and notes. `README.md` user guide
+  (Mac / Windows install and start).
