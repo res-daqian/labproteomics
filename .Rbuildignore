@@ -1,0 +1,11 @@
+^demo_data$
+^runs$
+^docs$
+^scripts$
+^CLAUDE\.md$
+^PROGRESS\.md$
+^PROVENANCE\.md$
+^INSTALL\.md$
+^\.gitignore$
+^.*\.Rproj$
+^\.Rproj\.user$

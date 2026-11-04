@@ -1,0 +1,45 @@
+Package: labproteomics
+Title: Lab Proteomics Workbench (working name): a local Shiny application for label-free quantitative proteomics
+Version: 0.0.1
+Authors@R: person("Daqian", "Lu", email = "res.ludaqian@gmail.com", role = c("aut", "cre"))
+Description: A locally run Shiny application that packages a peptide-level
+    label-free proteomics workflow (MS-DAP import, filtering, normalisation,
+    protein roll-up, DEqMS differential analysis, Hallmark GSEA, and a
+    two-contrast rescue classification) with a reproducible run record for
+    every analysis. The statistical engine is a set of plain R functions that
+    can be used without the interface.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Depends:
+    R (>= 4.4),
+    msdap (>= 1.2.2)
+Imports:
+    shiny (>= 1.8.1),
+    bslib (>= 0.7.0),
+    DT,
+    dplyr,
+    tidyr,
+    tibble,
+    readr,
+    ggplot2 (>= 3.5.0),
+    ggrepel,
+    patchwork,
+    limma,
+    jsonlite,
+    rlang,
+    stats,
+    utils,
+    tools,
+    digest,
+    fgsea,
+    msigdbr,
+    rmarkdown,
+    htmltools
+Suggests:
+    shinyFiles,
+    readxl,
+    testthat (>= 3.0.0),
+    knitr
+Config/testthat/edition: 3

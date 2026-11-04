@@ -1,0 +1,119 @@
+---
+title: "Analysis run record"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: true
+    theme: cosmo
+params:
+  run_dir: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE)
+run_dir <- params$run_dir
+s <- jsonlite::fromJSON(file.path(run_dir, "run_summary.json"), simplifyVector = TRUE)
+fig <- function(name) {
+  p <- file.path(run_dir, "figures", paste0(name, ".png"))
+  if (file.exists(p)) knitr::include_graphics(p) else invisible(NULL)
+}
+kable <- function(x, ...) if (!is.null(x) && length(x) && NROW(x)) knitr::kable(x, ...) else invisible(NULL)
+```
+
+Created `r s$created`. Folder: `r run_dir`
+
+`r if (nzchar(s$notes %||% "")) paste0("Notes: ", s$notes)`
+
+## Input
+
+| Item | Value |
+|---|---|
+| File | `r s$input$path` |
+| Format | `r s$input$format` (acquisition mode `r s$input$acquisition_mode`) |
+| MD5 | `r s$input$md5` |
+| Size (MB) | `r s$input$size_mb` |
+| FASTA | `r if (length(s$input$fasta)) paste(s$input$fasta, collapse = ", ") else "none"` |
+| Precursor confidence | `r s$input$confidence` |
+| Runs / peptides / proteins | `r s$data$n_runs` / `r s$data$n_peptides` / `r s$data$n_proteins` |
+| Excluded in annotation | `r if (length(s$excluded_in_annotation)) paste(s$excluded_in_annotation, collapse = ", ") else "none"` |
+| Excluded after QC | `r if (length(s$excluded_after_qc)) paste(s$excluded_after_qc, collapse = ", ") else "none"` |
+
+```{r}
+kable(s$groups, caption = "Runs per group")
+```
+
+`r if (is.null(s$qc)) "" else "## Quality control"`
+
+```{r, eval = !is.null(s$qc)}
+cat(sprintf("Matrix: %d proteins x %d runs; normalisation %s, roll-up %s; outlier flags use %d MAD within %s.\n\n",
+            s$qc$n_proteins, s$qc$n_runs, s$qc$params$norm, s$qc$params$rollup, s$qc$params$mad_k, s$qc$params$flag_strata))
+cat(sprintf("Missing fraction: median %.3f, maximum %.3f. Minimum median correlation %.3f.\n\n",
+            s$qc$missing_fraction_median, s$qc$missing_fraction_max, s$qc$median_correlation_min))
+cat("Runs with two or more flags: ", if (length(s$qc$candidate_outliers)) paste(s$qc$candidate_outliers, collapse = ", ") else "none", "\n")
+```
+
+```{r, eval = !is.null(s$qc), out.width = "100%"}
+fig("qc_missingness")
+```
+
+```{r, eval = !is.null(s$qc), out.width = "49%", fig.show = "hold"}
+fig("qc_medians"); fig("qc_pca"); fig("qc_correlation"); fig("qc_drift"); fig("qc_batch"); fig("qc_pairs"); fig("qc_outliers")
+```
+
+`r if (is.null(s$dea)) "" else "## Differential analysis"`
+
+```{r, eval = !is.null(s$dea)}
+p <- s$dea$params
+cat(sprintf("Filter: >= %d peptides per protein, detected in >= %.0f%% of runs; normalisation %s; roll-up %s; model %s; second engine limma-trend for concordance.\n\n",
+            p$min_peptides_per_protein, 100 * p$min_detect_fraction, p$norm, p$rollup, p$dea_algorithm))
+kable(s$dea$summary, digits = 3, caption = "Contrast summary (n_hits uses the stated gate)")
+```
+
+```{r, eval = !is.null(s$dea), results = "asis"}
+for (lab in s$dea$summary$contrast) {
+  f <- file.path(run_dir, "figures", paste0("volcano_", gsub("[^A-Za-z0-9_-]+", "_", lab), ".png"))
+  if (file.exists(f)) cat(sprintf("\n\n### %s\n\n![](%s){width=70%%}\n\n", lab, f))
+  t <- file.path(run_dir, "tables", paste0("dea_", gsub("[^A-Za-z0-9_-]+", "_", lab), "_hits.csv"))
+  if (file.exists(t)) {
+    h <- utils::read.csv(t, nrows = 20)
+    if (nrow(h)) print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "npep"), names(h))], digits = 4, caption = "First 20 hits (sorted by p)"))
+  }
+}
+```
+
+`r if (is.null(s$rescue)) "" else "## Rescue classification"`
+
+```{r, eval = !is.null(s$rescue)}
+cat(sprintf("Disease contrast: %s. Treatment contrast: %s. Drug-only contrast: %s.\n\nGate: %s\n\n",
+            s$rescue$labels$disease, s$rescue$labels$treatment, if (is.na(s$rescue$labels$drug)) "none" else s$rescue$labels$drug, s$rescue$gate))
+kable(data.frame(tier = names(s$rescue$definitions), definition = unlist(s$rescue$definitions)), caption = "Definitions")
+kable(s$rescue$counts, caption = "Counts")
+```
+
+```{r, eval = !is.null(s$rescue), out.width = "70%"}
+fig("rescue_disease_vs_treatment")
+```
+
+`r if (is.null(s$enrichment)) "" else "## Enrichment"`
+
+```{r, eval = !is.null(s$enrichment), results = "asis"}
+for (nm in names(s$enrichment)) {
+  e <- s$enrichment[[nm]]
+  cat(sprintf("\n\n### %s\n\n%s: %d sets tested on %d ranked genes (%d of %d proteins mapped).\n\n", nm, e$collection, e$n_sets_tested, e$n_genes, e$n_mapped, e$n_total))
+  print(knitr::kable(e$top, digits = 4))
+  f <- file.path(run_dir, "figures", paste0("gsea_hallmark_", gsub("[^A-Za-z0-9_-]+", "_", nm), ".png"))
+  if (file.exists(f)) cat(sprintf("\n\n![](%s){width=80%%}\n\n", f))
+}
+```
+
+## Software
+
+R `r s$versions$R` on `r s$versions$platform`.
+
+```{r}
+v <- s$versions$packages
+kable(data.frame(package = names(v), version = unlist(lapply(v, function(x) if (is.null(x)) NA else x))), row.names = FALSE)
+```
+
+Files: `parameters.json` (every parameter), `package_versions.json`, `session_info.txt`, `tables/`, `figures/` (PDF and PNG).

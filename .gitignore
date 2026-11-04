@@ -1,0 +1,15 @@
+# large or local data: never committed
+demo_data/*.parquet
+demo_data/*.fasta
+demo_data/*.rds
+runs/
+*.rds
+.Rproj.user/
+.Rhistory
+.RData
+.DS_Store
+inst/doc
+/doc/
+/Meta/
+*.html
+!inst/report/*.html
