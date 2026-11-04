@@ -12,13 +12,19 @@
 #' @param treatment [run_contrast()] result: treated disease group vs disease group
 #' @param drug_only optional [run_contrast()] result: drug on control vs control (annotation only)
 #' @param fc_threshold,p_threshold,use_adjusted significance gate applied to every contrast
+#' @param gate "p", "q" or "treat" (overrides `use_adjusted` when given)
 #' @export
-rescue_classify <- function(disease, treatment, drug_only = NULL, fc_threshold = 1.2, p_threshold = 0.05, use_adjusted = FALSE) {
+rescue_classify <- function(disease, treatment, drug_only = NULL, fc_threshold = 1.2, p_threshold = 0.05, use_adjusted = FALSE, gate = NULL) {
   fc_cut <- log2(fc_threshold)
-  pcol <- if (isTRUE(use_adjusted)) "qvalue" else "pvalue"
+  gate <- gate %||% if (isTRUE(use_adjusted)) "q" else "p"
+  if (!gate %in% c("p", "q", "treat")) stop("gate must be 'p', 'q' or 'treat'.")
+  use_adjusted <- gate == "q"
+  pcol <- switch(gate, p = "pvalue", q = "qvalue", treat = "treat_q")
+  for (res in list(disease, treatment, drug_only)) if (!is.null(res) && !pcol %in% names(res$table)) stop("The contrast tables have no column ", pcol, " (run the contrasts with this gate).")
   take <- function(res, prefix) {
     out <- res$table[, c("protein_id", "gene_symbol", "description", "log2FC", pcol)]
     names(out) <- c("protein_id", "gene_symbol", "description", paste0(prefix, "_log2FC"), paste0(prefix, "_p"))
+    if ("loo_fragile" %in% names(res$table)) out[[paste0(prefix, "_fragile")]] <- res$table$loo_fragile
     out
   }
   dz <- take(disease, "disease")
@@ -60,14 +66,14 @@ rescue_classify <- function(disease, treatment, drug_only = NULL, fc_threshold =
     dplyr::mutate(n = ifelse(is.na(.data$n), 0L, .data$n))
   list(
     table = merged, counts = counts, fc_cut = fc_cut,
-    gate = gate_label(fc_threshold, p_threshold, use_adjusted),
-    params = list(fc_threshold = fc_threshold, p_threshold = p_threshold, use_adjusted = use_adjusted),
+    gate = gate_label(fc_threshold, p_threshold, gate),
+    params = list(fc_threshold = fc_threshold, p_threshold = p_threshold, use_adjusted = use_adjusted, gate = gate),
     labels = list(disease = disease$spec$label, treatment = treatment$spec$label,
                   drug = if (is.null(drug_only)) NA_character_ else drug_only$spec$label),
     definitions = c(
       "Tier 1" = "disease contrast significant AND treatment contrast significant in the opposite direction",
       "Tier 2" = sprintf("disease contrast significant AND treatment contrast not significant (%s >= %s) AND |disease log2FC + treatment log2FC| < log2(%s)",
-                         if (use_adjusted) "q" else "p", format(p_threshold), format(fc_threshold)),
+                         switch(gate, p = "p", q = "q", treat = "treat q"), format(p_threshold), format(fc_threshold)),
       "Disease-only" = "disease contrast significant but neither tier applies (includes treatment effects that pass p but not the fold-change threshold)",
       "Not perturbed" = "disease contrast not significant"
     ),

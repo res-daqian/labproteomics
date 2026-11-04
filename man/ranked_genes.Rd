@@ -9,8 +9,7 @@ ranked_genes(result, ortholog_map = NULL)
 \arguments{
 \item{result}{\code{\link[=run_contrast]{run_contrast()}} result}
 
-\item{ortholog_map}{optional data frame from \code{\link[=read_ortholog_map]{read_ortholog_map()}}; without it the gene
-symbols of the data are used as they are (suitable for human or mouse data)}
+\item{ortholog_map}{optional data frame from \code{\link[=read_ortholog_map]{read_ortholog_map()}}}
 }
 \value{
 list(ranks = named numeric vector sorted decreasing, n_total, n_mapped, n_unique)

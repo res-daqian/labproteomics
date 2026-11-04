@@ -44,10 +44,15 @@ coalesce_char_columns <- function(df, columns) {
   out
 }
 
-# A verbatim, human-readable statement of a significance gate.
-gate_label <- function(fc_threshold, p_threshold, use_adjusted) {
+# A verbatim, human-readable statement of a significance gate. `gate` is "p", "q" or "treat";
+# a logical value is accepted for the older use_adjusted flag.
+gate_label <- function(fc_threshold, p_threshold, gate = "p") {
+  if (is.logical(gate)) gate <- if (isTRUE(gate)) "q" else "p"
+  if (identical(gate, "treat")) {
+    return(sprintf("limma treat q < %s for H1: |log2FC| > log2(%s) (= %.3f)", format(p_threshold), format(fc_threshold), log2(fc_threshold)))
+  }
   sprintf("|log2FC| >= log2(%s) (= %.3f) AND %s < %s",
-          format(fc_threshold), log2(fc_threshold), if (use_adjusted) "q" else "p", format(p_threshold))
+          format(fc_threshold), log2(fc_threshold), if (identical(gate, "q")) "q" else "p", format(p_threshold))
 }
 
 lp_message <- function(...) {
@@ -55,7 +60,7 @@ lp_message <- function(...) {
 }
 
 package_versions <- function() {
-  pkgs <- c("labproteomics", "msdap", "limma", "DEqMS", "fgsea", "msigdbr", "shiny", "bslib", "ggplot2", "dplyr", "arrow")
+  pkgs <- c("labproteomics", "msdap", "limma", "DEqMS", "fgsea", "msigdbr", "shiny", "bslib", "ggplot2", "dplyr", "arrow", "vsn", "MSnbase")
   versions <- lapply(pkgs, function(p) {
     if (requireNamespace(p, quietly = TRUE)) as.character(utils::packageVersion(p)) else NA_character_
   })

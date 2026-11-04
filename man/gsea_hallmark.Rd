@@ -2,7 +2,7 @@
 % Please edit documentation in R/enrichment.R
 \name{gsea_hallmark}
 \alias{gsea_hallmark}
-\title{Hallmark GSEA with fgsea}
+\title{Hallmark GSEA with fgsea (kept for compatibility; calls \code{\link[=gsea_collection]{gsea_collection()}})}
 \usage{
 gsea_hallmark(
   ranked,
@@ -22,5 +22,5 @@ gsea_hallmark(
 \item{seed}{random seed for the permutation procedure}
 }
 \description{
-Hallmark GSEA with fgsea
+Hallmark GSEA with fgsea (kept for compatibility; calls \code{\link[=gsea_collection]{gsea_collection()}})
 }

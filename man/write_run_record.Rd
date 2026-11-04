@@ -13,7 +13,13 @@ write_run_record(
   enrichment = list(),
   excluded = character(),
   notes = "",
-  render_report = TRUE
+  render_report = TRUE,
+  design = NULL,
+  scorecard = NULL,
+  markers = NULL,
+  search_log = NULL,
+  ortholog_map = NULL,
+  adapters = TRUE
 )
 }
 \arguments{
@@ -27,13 +33,25 @@ write_run_record(
 
 \item{rescue}{optional \code{\link[=rescue_classify]{rescue_classify()}} result}
 
-\item{enrichment}{named list of \code{\link[=gsea_hallmark]{gsea_hallmark()}} results (names = contrast labels)}
+\item{enrichment}{named list of \code{\link[=gsea_collection]{gsea_collection()}} / \code{\link[=ora_collection]{ora_collection()}} results}
 
 \item{excluded}{run identifiers excluded after QC (in addition to the annotation)}
 
 \item{notes}{free text written to the record}
 
 \item{render_report}{build the HTML report (needs pandoc)}
+
+\item{design}{optional \code{\link[=design_check]{design_check()}} result}
+
+\item{scorecard}{optional \code{\link[=run_scorecard]{run_scorecard()}} result}
+
+\item{markers}{optional \code{\link[=marker_scores]{marker_scores()}} result}
+
+\item{search_log}{optional \code{\link[=read_diann_log]{read_diann_log()}} result}
+
+\item{ortholog_map}{optional ortholog map used for the adapter exports}
+
+\item{adapters}{write the external-tool adapter tables (IPA, iPathwayGuide, STRING, Cytoscape)}
 }
 \value{
 the run folder (invisibly)

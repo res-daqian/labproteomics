@@ -13,3 +13,5 @@ inst/doc
 /Meta/
 *.html
 !inst/report/*.html
+demo_data/*.stats.tsv
+demo_data/*.log.txt

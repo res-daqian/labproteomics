@@ -2,17 +2,17 @@
 % Please edit documentation in R/enrichment.R
 \name{gsea_plot}
 \alias{gsea_plot}
-\title{Bar chart of normalised enrichment scores}
+\title{Bar chart of normalised enrichment scores (GSEA)}
 \usage{
 gsea_plot(gsea, top = 20, padj_threshold = 0.05)
 }
 \arguments{
-\item{gsea}{result of \code{\link[=gsea_hallmark]{gsea_hallmark()}}}
+\item{gsea}{result of \code{\link[=gsea_collection]{gsea_collection()}}}
 
 \item{top}{number of gene sets to show (ordered by adjusted p)}
 
 \item{padj_threshold}{adjusted p below which a bar is coloured}
 }
 \description{
-Bar chart of normalised enrichment scores
+Bar chart of normalised enrichment scores (GSEA)
 }

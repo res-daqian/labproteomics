@@ -9,5 +9,6 @@ dea_defaults()
 \description{
 These are the locked defaults of the retina atropine study: at least two peptides per
 protein, detection in at least half of the runs, vwmb normalisation, MaxLFQ roll-up,
-DEqMS, fold change 1.2 and unadjusted p below 0.05.
+DEqMS, fold change 1.2 and unadjusted p below 0.05. The gate can be "p", "q" (Benjamini-
+Hochberg) or "treat" (limma treat against the fold-change threshold).
 }

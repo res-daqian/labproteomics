@@ -27,6 +27,8 @@ Imports:
     ggrepel,
     patchwork,
     limma,
+    DEqMS,
+    grid,
     jsonlite,
     rlang,
     stats,

@@ -10,7 +10,8 @@ rescue_classify(
   drug_only = NULL,
   fc_threshold = 1.2,
   p_threshold = 0.05,
-  use_adjusted = FALSE
+  use_adjusted = FALSE,
+  gate = NULL
 )
 }
 \arguments{
@@ -21,6 +22,8 @@ rescue_classify(
 \item{drug_only}{optional \code{\link[=run_contrast]{run_contrast()}} result: drug on control vs control (annotation only)}
 
 \item{fc_threshold, p_threshold, use_adjusted}{significance gate applied to every contrast}
+
+\item{gate}{"p", "q" or "treat" (overrides \code{use_adjusted} when given)}
 }
 \description{
 Classify proteins by whether a treatment reverses a disease effect

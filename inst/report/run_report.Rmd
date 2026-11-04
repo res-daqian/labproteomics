@@ -14,11 +14,13 @@ params:
 knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = "", results = "asis")
 run_dir <- params$run_dir
 s <- jsonlite::fromJSON(file.path(run_dir, "run_summary.json"), simplifyVector = TRUE)
+`%||%` <- function(x, y) if (is.null(x) || length(x) == 0) y else x
 fig <- function(name) {
   p <- file.path(run_dir, "figures", paste0(name, ".png"))
   if (file.exists(p)) knitr::include_graphics(p) else invisible(NULL)
 }
 kable <- function(x, ...) if (!is.null(x) && length(x) && NROW(x)) knitr::kable(x, ...) else invisible(NULL)
+safe_label <- function(x) gsub("[^A-Za-z0-9_-]+", "_", x)
 ```
 
 Created `r s$created`. Folder: `r run_dir`
@@ -38,12 +40,49 @@ Created `r s$created`. Folder: `r run_dir`
 | Runs / peptides / proteins | `r s$data$n_runs` / `r s$data$n_peptides` / `r s$data$n_proteins` |
 | Excluded in annotation | `r if (length(s$excluded_in_annotation)) paste(s$excluded_in_annotation, collapse = ", ") else "none"` |
 | Excluded after QC | `r if (length(s$excluded_after_qc)) paste(s$excluded_after_qc, collapse = ", ") else "none"` |
+| Search engine | `r if (is.null(s$search)) "no log found" else sprintf("%s (started %s, %s files; settings in search_engine_settings.txt)", s$search$version, s$search$started, s$search$n_files)` |
 
 ```{r}
 cat("\n\n**Runs per group**\n\n"); kable(s$groups)
 ```
 
-`r if (is.null(s$qc)) "" else "## Quality control"`
+`r if (is.null(s$design)) "" else "## Design check"`
+
+```{r, eval = !is.null(s$design)}
+m <- s$design$messages
+cat(paste0("- **", m$level, "**: ", m$text, collapse = "\n"), "\n\n")
+if (!is.null(s$design$batch_table)) { cat("\n\n**Runs per group and batch**\n\n"); print(knitr::kable(s$design$batch_table)) }
+```
+
+`r if (is.null(s$scorecard)) "" else "## Run scorecard (search-engine statistics per run)"`
+
+```{r, eval = !is.null(s$scorecard)}
+sc <- s$scorecard
+cat(sprintf("Flags within %s (%s MAD; identifications below %.0f%% of the median). %d of %d runs have at least one flag; two or more: %s.\n\n",
+            sc$summary$strata, format(sc$params$mad_k), 100 * sc$params$id_fraction, sc$summary$n_flagged, sc$summary$n_runs,
+            if (length(sc$summary$runs_two_or_more)) paste(sc$summary$runs_two_or_more, collapse = ", ") else "none"))
+if (length(sc$summary$batch_differences)) cat(sprintf("Systematic differences between batches (Kruskal-Wallis p < 0.01): %s.\n\n", paste(sc$summary$batch_differences, collapse = "; ")))
+cat("\n\n**Flag rules**\n\n"); print(knitr::kable(sc$rules))
+cat("\n\n**Systematic differences**\n\n"); print(knitr::kable(sc$systematic, digits = 4))
+```
+
+```{r, eval = !is.null(s$scorecard), out.width = "100%"}
+fig("run_scorecard")
+```
+
+`r if (is.null(s$markers)) "" else "## Tissue purity and contamination markers"`
+
+```{r, eval = !is.null(s$markers)}
+mk <- s$markers
+cat(sprintf("Tissue: %s. Runs with a flag: %s.\n\n", mk$params$tissue, if (length(mk$summary$runs_flagged)) paste(mk$summary$runs_flagged, collapse = ", ") else "none"))
+print(knitr::kable(mk$panel))
+```
+
+```{r, eval = !is.null(s$markers), out.width = "100%"}
+fig("marker_panel")
+```
+
+`r if (is.null(s$qc)) "" else "## Cohort quality control"`
 
 ```{r, eval = !is.null(s$qc)}
 cat(sprintf("Matrix: %d proteins x %d runs; normalisation %s, roll-up %s; outlier flags use %d MAD within %s.\n\n",
@@ -65,19 +104,33 @@ fig("qc_medians"); fig("qc_pca"); fig("qc_correlation"); fig("qc_drift"); fig("q
 
 ```{r, eval = !is.null(s$dea)}
 p <- s$dea$params
-cat(sprintf("Filter: >= %d peptides per protein, detected in >= %.0f%% of runs; normalisation %s; roll-up %s; model %s; second engine limma-trend for concordance.\n\n",
+cat(sprintf("Filter: >= %d peptides per protein, detected in >= %.0f%% of runs; normalisation %s; roll-up %s; model %s; second engine limma-trend for concordance and treat.\n\n",
             p$min_peptides_per_protein, 100 * p$min_detect_fraction, p$norm, p$rollup, p$dea_algorithm))
-cat("\n\n**Contrast summary** (n_hits uses the stated gate)\n\n"); kable(s$dea$summary, digits = 3)
+cat("\n\n**Contrast summary** (n_hits uses the stated gate; n_hits_treat = limma treat q; n_fragile = hits lost in leave-one-out; n_detection_only = seen in one group only)\n\n")
+print(knitr::kable(s$dea$summary, digits = 3))
 ```
 
 ```{r, eval = !is.null(s$dea), results = "asis"}
 for (lab in s$dea$summary$contrast) {
-  f <- file.path(run_dir, "figures", paste0("volcano_", gsub("[^A-Za-z0-9_-]+", "_", lab), ".png"))
-  if (file.exists(f)) cat(sprintf("\n\n### %s\n\n![](%s){width=70%%}\n\n", lab, f))
-  t <- file.path(run_dir, "tables", paste0("dea_", gsub("[^A-Za-z0-9_-]+", "_", lab), "_hits.csv"))
+  cat(sprintf("\n\n### %s\n\n", lab))
+  cc <- s$dea$contrasts[[lab]]
+  if (!is.null(cc)) {
+    cat(sprintf("Gate: %s. %d of %d proteins pass.\n\n", cc$gate, cc$n_hit, cc$n_tested))
+    if (!is.null(cc$loo)) cat(sprintf("Leave-one-out: %d hits fragile, %d robust (%d %s refits). Definition: %s.\n\n", cc$loo$n_fragile, cc$loo$n_robust, cc$loo$units, cc$loo$unit_type, cc$loo$definition))
+    if (!is.null(cc$treat)) cat(sprintf("limma treat: %d hits (%s).\n\n", cc$treat$n_hits, cc$treat$definition))
+    if (!is.null(cc$detection)) cat(sprintf("Detection-only differences: %d proteins (%d case only, %d control only); %s.\n\n", cc$detection$n, cc$detection$n_case_only, cc$detection$n_control_only, cc$detection$definition))
+  }
+  f <- file.path(run_dir, "figures", paste0("volcano_", safe_label(lab), ".png"))
+  if (file.exists(f)) cat(sprintf("![](%s){width=70%%}\n\n", f))
+  t <- file.path(run_dir, "tables", paste0("dea_", safe_label(lab), "_hits.csv"))
   if (file.exists(t)) {
     h <- utils::read.csv(t, nrows = 20)
-    if (nrow(h)) cat("\n\n**First 20 hits** (sorted by p)\n\n"); print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "npep"), names(h))], digits = 4))
+    if (nrow(h)) { cat("\n\n**First 20 hits** (sorted by p)\n\n"); print(knitr::kable(h[, intersect(c("protein_id", "gene_symbol", "log2FC", "pvalue", "qvalue", "treat_q", "npep", "loo_n_kept", "loo_n_refits", "loo_fragile"), names(h))], digits = 4)) }
+  }
+  t2 <- file.path(run_dir, "tables", paste0("dea_", safe_label(lab), "_detection_only.csv"))
+  if (file.exists(t2)) {
+    h2 <- utils::read.csv(t2, nrows = 15)
+    if (nrow(h2)) { cat("\n\n**Detection-only differences (first 15)**\n\n"); print(knitr::kable(h2[, intersect(c("protein_id", "gene_symbol", "pattern", "n_detected_case", "n_case", "n_detected_control", "n_control", "fisher_p", "fisher_q", "npep_max"), names(h2))], digits = 4)) }
   }
 }
 ```
@@ -100,10 +153,23 @@ fig("rescue_disease_vs_treatment")
 ```{r, eval = !is.null(s$enrichment), results = "asis"}
 for (nm in names(s$enrichment)) {
   e <- s$enrichment[[nm]]
-  cat(sprintf("\n\n### %s\n\n%s: %d sets tested on %d ranked genes (%d of %d proteins mapped).\n\n", nm, e$collection, e$n_sets_tested, e$n_genes, e$n_mapped, e$n_total))
+  cat(sprintf("\n\n### %s\n\n%s, %s: %d sets tested on %d genes (%d of %d proteins mapped)%s.\n\n", nm, e$method, e$collection, e$n_sets_tested, e$n_genes, e$n_mapped, e$n_total,
+              if (!is.null(e$background) && !is.na(e$background)) paste0("; background = ", e$background) else ""))
   print(knitr::kable(e$top, digits = 4))
-  f <- file.path(run_dir, "figures", paste0("gsea_hallmark_", gsub("[^A-Za-z0-9_-]+", "_", nm), ".png"))
+  f <- file.path(run_dir, "figures", paste0("enrichment_", safe_label(nm), ".png"))
   if (file.exists(f)) cat(sprintf("\n\n![](%s){width=80%%}\n\n", f))
+}
+```
+
+`r if (is.null(s$adapters)) "" else "## Upload tables for external tools"`
+
+```{r, eval = !is.null(s$adapters)}
+a <- s$adapters
+cat(paste0("- ", a$notes, collapse = "\n"), "\n\n")
+for (nm in names(a$contrasts)) {
+  cc <- a$contrasts[[nm]]
+  cat(sprintf("- **%s**: %s; %d tested, %d mapped, %d unique symbols, %d hits. Files in `adapters/`: %s, %s, %s, %s, %s.\n",
+              cc$contrast, cc$identifier, cc$n_tested, cc$n_mapped, cc$n_unique_symbols, cc$n_hits, cc$ipa, cc$ipathwayguide, cc$string_hits, cc$string_values, cc$cytoscape_nodes))
 }
 ```
 
@@ -116,4 +182,4 @@ v <- s$versions$packages
 kable(data.frame(package = names(v), version = unlist(lapply(v, function(x) if (is.null(x)) NA else x))), row.names = FALSE)
 ```
 
-Files: `parameters.json` (every parameter), `package_versions.json`, `session_info.txt`, `tables/`, `figures/` (PDF and PNG).
+Files: `parameters.json` (every parameter), `package_versions.json`, `session_info.txt`, `search_engine_settings.txt` (when a log was found), `tables/`, `figures/` (PDF and PNG), `adapters/`.

@@ -18,4 +18,7 @@ run_contrast(ds, spec, params = list(), exclude_samples = character())
 \description{
 Subsets the dataset to the two groups (complete pairs only when paired), filters and
 normalises within the contrast, fits the differential model and returns an annotated table.
+Also returns the detection-only differences (proteins seen in one group but not the other),
+limma treat p-values against the fold-change threshold and, when \code{loo = TRUE}, the
+leave-one-out stability of every hit.
 }
