@@ -12,7 +12,7 @@ Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入�
 - Daqian 2026-11-05 回答：pooled QC 以后尽量带，旧数据基本没有；设计各种都有，每组 n 5–10；组织以视网膜、RPE/脉络膜、巩膜、泪液为主；小鸡直系同源表现在没有；同事基本留着 full report；界面要更美观、字体要换；demo 数据不支持 rescue 时可暂时去掉该模块。
 
 ## 2. 现在做到哪
-- **安全点**：git tag `demo-2026-11-06-safe` = 周三晚可演示的第一版（commit 474627d）。回退：`git checkout demo-2026-11-06-safe` 后 `R CMD INSTALL --no-docs --no-multiarch .`（看完 demo 再 `git checkout main`）。注意第一版的 demo 按钮指向论文数据，回退时要把 `golden_data/` 里的文件复制回 `demo_data/`。
+- **安全点**：git tag `demo-2026-11-06-safe` = 周三晚可演示的第一版（commit e8d786d）。回退：`git checkout demo-2026-11-06-safe` 后 `R CMD INSTALL --no-docs --no-multiarch .`（看完 demo 再 `git checkout main`）。注意第一版的 demo 按钮指向论文数据，回退时要把 `golden_data/` 里的文件复制回 `demo_data/`。
 - **第三版（2026-11-05 凌晨）已在公开数据上 headless 全流程跑通**：console 零错误；单元测试 73 项通过；golden 测试 17 项通过（论文数字不变）。
 - 第三版改动：
   1. **demo 数据换成 PXD079891**（见第 1 节）。注释表：`group` = Control / MANCR_KD；`subject_id` = 供体；`batch` = 供体性别（女 1–8 号、男 9–16 号两段采集，是唯一能当批次的分组）；`sex` 同值；无预先排除。
