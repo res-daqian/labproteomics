@@ -78,7 +78,8 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   beginner), package installs into the user library (document what and why), mechanics.
 - Discuss first: new analysis methods, changes to the rescue definitions or default gates,
   anything shown to the lab or the supervisor.
-- Opt-in only: `git push`, destructive git operations.
+- Opt-in only: destructive git operations (force push, history rewrite, branch deletion). Pushing
+  `main` after each commit is routine since 2026-11-05 (Daqian's instruction).
 
 ## Where things are
 
@@ -99,5 +100,6 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   user guide; `scripts/install_dependencies.R` one-shot dependency installer for colleagues.
 - Public repository since 2026-11-05 evening: https://github.com/res-daqian/labproteomics
   (remote `origin`, branch `main`, tag `demo-2026-11-06-safe` pushed; Daqian created it himself
-  with `gh repo create` because the harness blocks publication actions). `git push` stays opt-in:
-  ask before every push unless Daqian says pushes are routine.
+  with `gh repo create` because the harness blocks publication actions). Since 2026-11-05 evening
+  Daqian wants every commit pushed right away ("以后每次提交都顺手推送"): commit, then
+  `git push origin main`. Destructive git operations (history rewrite, force push) stay opt-in.
