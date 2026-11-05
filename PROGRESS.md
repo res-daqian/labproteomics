@@ -31,6 +31,7 @@ Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入�
 - **GitHub**：2026-11-05 晚公开仓库 https://github.com/res-daqian/labproteomics（Daqian 自己执行 `gh repo create`，main 与 tag 已推送；本机 `origin` 已配置）。同事安装：`remotes::install_github("res-daqian/labproteomics")`，已从 GitHub 实装验证。
 - **给同事的安装**：`source("scripts/install_dependencies.R")` 再 `remotes::install_local(".")`；或打包 `labproteomics_0.0.1.tar.gz` 分发；GitHub 发布等 Daqian 确认（仓库名、公开或私有）。
 - 第二版（2026-11-05 凌晨早些时候）的内容仍在：设计检查、run 成绩单、marker 面板、检出差异、limma treat 门槛、留一法、GSEA/ORA 多集合、导出适配、运行记录与报告。
+- **组会后的第一件事（Daqian 2026-11-05 晚定）**：多变量设计。第一步只改诊断：注释表任意额外列自动判类型，Data 页选「哪一列是批次」，设计检查对每个分类列做交叉 / 混杂判定、对每个数值列做组间平衡检验，输出协变量平衡表；第二步 DEA 页「Adjust for」把分类 / 数值校正项经 msdap 的 additional_variables 进模型，留一法同步；第三步析因 / 交互与连续表型关联，先讨论再做。当前版本只认 group（比什么）、subject_id（进模型的区组）、batch（只诊断，不进模型）、run_order（漂移图）。
 - 未做：表型关联 / WGCNA；msqrob2 第二引擎；小鸡直系同源表；Windows 实测；renv；异步计算；Spectronaut / FragPipe 实测数据（成绩单只认 DIA-NN 的 stats 文件；候选 Spectronaut 公开数据 PXD033653，775 MB）；人类 FASTA 的下载；若要 Windows 上字体完全一致，需打包一款 OFL 网络字体（需 Daqian 同意下载）。
 
 ## 3. Golden 数字（必须复现 PhD 锁定结果；数据在 `golden_data/`）
