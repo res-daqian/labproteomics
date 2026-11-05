@@ -1,0 +1,21 @@
+@page { size: A4; margin: 14mm 14mm 16mm 14mm; }
+body { font-family: Arial, Helvetica, sans-serif; font-size: 10.5pt; color: #24333a; line-height: 1.45; max-width: 1000px; margin: 0 auto; padding: 0 12px; }
+h1.title { font-family: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: 22pt; color: #015069; margin: 0.2em 0 0.1em 0; }
+h2 { font-family: Charter, "Iowan Old Style", "Palatino Linotype", Georgia, serif; font-size: 15pt; color: #015069; border-bottom: 1px solid #e1e6e6; padding-bottom: 3px; margin-top: 1.4em; page-break-before: always; }
+h2:first-of-type { page-break-before: auto; }
+h3 { font-size: 12pt; color: #24333a; margin-top: 1.2em; }
+.lp-head { margin-bottom: 1em; }
+.lp-kicker { font-size: 8.5pt; letter-spacing: 0.12em; text-transform: uppercase; color: #6b7a80; }
+.lp-meta { color: #6b7a80; font-size: 9.5pt; }
+.lp-notes { margin-top: 0.4em; padding: 0.4em 0.7em; background: #f1f6f7; border-left: 3px solid #015069; font-size: 9.5pt; }
+table { border-collapse: collapse; font-size: 8.5pt; margin: 0.4em 0 1em 0; width: auto; max-width: 100%; }
+th { text-align: left; font-size: 7.5pt; text-transform: uppercase; letter-spacing: 0.06em; color: #6b7a80; border-bottom: 1px solid #e1e6e6; padding: 3px 7px; }
+td { padding: 2.5px 7px; border-bottom: 1px solid #edf0f0; vertical-align: top; }
+tr { page-break-inside: avoid; }
+img { max-width: 100%; page-break-inside: avoid; }
+.lp-msg { display: flex; gap: 0.5em; padding: 0.35em 0.6em; border-radius: 5px; margin: 0.25em 0; font-size: 9.5pt; background: #fafbfb; border: 1px solid #edf0f0; page-break-inside: avoid; }
+.lp-dot { width: 7px; height: 7px; border-radius: 50%; margin-top: 0.45em; flex: none; background: #a3aeb3; }
+.lp-ok .lp-dot { background: #009076; } .lp-info .lp-dot { background: #18a1cd; } .lp-warn .lp-dot { background: #fa8c00; } .lp-danger .lp-dot { background: #c71e1d; }
+.lp-danger { border-color: #f2c4c0; background: #fdf4f3; } .lp-warn { border-color: #f9dcb3; background: #fff9f0; }
+#TOC { font-size: 9pt; } #TOC ul { padding-left: 1em; }
+@media print { #TOC { display: none; } body { max-width: none; padding: 0; } }

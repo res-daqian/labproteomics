@@ -1,0 +1,184 @@
+---
+title: "Quality-control report"
+output:
+  html_document:
+    toc: true
+    toc_depth: 2
+    self_contained: true
+    theme: null
+    highlight: null
+    css: qc_report.css
+params:
+  run_dir: ""
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = FALSE, warning = FALSE, message = FALSE, comment = "", results = "asis")
+run_dir <- params$run_dir
+s <- jsonlite::fromJSON(file.path(run_dir, "run_summary.json"), simplifyVector = TRUE)
+`%||%` <- function(x, y) if (is.null(x) || length(x) == 0) y else x
+fig <- function(name) {
+  p <- file.path(run_dir, "figures", paste0(name, ".png"))
+  if (file.exists(p)) knitr::include_graphics(p) else invisible(NULL)
+}
+tab <- function(name) {
+  p <- file.path(run_dir, "tables", paste0(name, ".csv"))
+  if (file.exists(p)) readr::read_csv(p, show_col_types = FALSE) else NULL
+}
+kable <- function(x, ...) if (!is.null(x) && length(x) && NROW(x)) print(knitr::kable(x, ...)) else invisible(NULL)
+fmt_p <- function(df, cols = c("p_batch", "p_group", "pvalue", "qvalue")) {
+  for (cn in intersect(cols, names(df))) df[[cn]] <- ifelse(is.na(df[[cn]]), NA_character_, formatC(as.numeric(df[[cn]]), format = "g", digits = 3))
+  df
+}
+pct <- function(x, d = 3) ifelse(is.na(x), NA_character_, formatC(100 * x, format = "f", digits = d))
+level_class <- c(ok = "ok", info = "info", warn = "warn", danger = "danger")
+```
+
+<div class="lp-head">
+<div class="lp-kicker">Lab Proteomics Workbench</div>
+<div class="lp-meta">Created `r s$created` &middot; `r s$data$n_runs` runs &middot; `r s$data$n_proteins` protein groups &middot; `r s$input$format`</div>
+`r if (nzchar(s$notes %||% "")) paste0("<div class=\"lp-notes\">", s$notes, "</div>")`
+</div>
+
+## Input and design
+
+| Item | Value |
+|---|---|
+| File | `r basename(s$input$path)` |
+| MD5 | `r s$input$md5` |
+| Format | `r s$input$format` (acquisition mode `r s$input$acquisition_mode`) |
+| Precursor confidence | `r s$input$confidence` |
+| Runs / peptides / proteins | `r s$data$n_runs` / `r s$data$n_peptides` / `r s$data$n_proteins` |
+| Search engine | `r if (is.null(s$search)) "no log found next to the report" else sprintf("%s, started %s, %s input files", s$search$version, s$search$started, s$search$n_files)` |
+| Excluded in the annotation | `r if (length(s$excluded_in_annotation)) paste(s$excluded_in_annotation, collapse = ", ") else "none"` |
+| Excluded after QC | `r if (length(s$excluded_after_qc)) paste(s$excluded_after_qc, collapse = ", ") else "none"` |
+
+```{r}
+cat("\n\n**Runs per group**\n\n"); kable(s$groups)
+ann <- tab("sample_annotation")
+if (!is.null(ann)) {
+  keep <- intersect(c("sample_name", "group", "subject_id", "batch", "run_order", "exclude"), names(ann))
+  cat("\n\n**Sample annotation**\n\n"); kable(ann[order(ann$run_order %||% seq_len(nrow(ann))), keep])
+}
+```
+
+```{r, eval = !is.null(s$design)}
+cat("\n\n### Design check\n\n")
+m <- s$design$messages
+cat(paste0("<div class=\"lp-msg lp-", level_class[m$level], "\"><span class=\"lp-dot\"></span>", m$text, "</div>", collapse = "\n"), "\n\n")
+if (!is.null(s$design$batch_table)) { cat("\n\n**Runs per group and batch**\n\n"); kable(s$design$batch_table) }
+gp <- tab("design_group_pairs")
+if (!is.null(gp)) { cat("\n\n**Pairs of groups**\n\n"); kable(gp) }
+```
+
+`r if (is.null(s$scorecard)) "" else "## Layer 1: run scorecard (search-engine statistics per run)"`
+
+```{r, eval = !is.null(s$scorecard)}
+sc <- s$scorecard
+cat(sprintf("Every metric is read from the search engine's per-run statistics file. A run is flagged when its value lies outside the median &plusmn; %s MAD of its %s (identifications: below %.0f%% of the median). %d of %d runs have at least one flag; two or more flags: %s.\n\n",
+            format(sc$params$mad_k), sc$summary$strata, 100 * sc$params$id_fraction, sc$summary$n_flagged, sc$summary$n_runs,
+            if (length(sc$summary$runs_two_or_more)) paste(sc$summary$runs_two_or_more, collapse = ", ") else "none"))
+if (length(sc$summary$cohort_notes)) cat(paste0("<div class=\"lp-msg lp-warn\"><span class=\"lp-dot\"></span>", sc$summary$cohort_notes, "</div>", collapse = "\n"), "\n\n")
+if (length(sc$summary$batch_differences)) cat(sprintf("<div class=\"lp-msg lp-info\"><span class=\"lp-dot\"></span>Systematic differences between batches (Kruskal-Wallis p &lt; 0.01): %s. These are batch effects at the instrument or digestion level, not single bad runs.</div>\n\n", paste(sc$summary$batch_differences, collapse = "; ")))
+if (length(sc$summary$group_differences)) cat(sprintf("<div class=\"lp-msg lp-info\"><span class=\"lp-dot\"></span>Systematic differences between groups (Kruskal-Wallis p &lt; 0.01): %s. When the groups are confounded with batch this is the same effect seen twice.</div>\n\n", paste(sc$summary$group_differences, collapse = "; ")))
+```
+
+```{r, eval = !is.null(s$scorecard), out.width = "100%"}
+fig("run_scorecard")
+```
+
+```{r, eval = !is.null(s$scorecard)}
+cat("\n\n**Flag rules**\n\n"); kable(sc$rules)
+cat("\n\n**Systematic differences (medians by batch; Kruskal-Wallis p by batch and by group)**\n\n"); kable(fmt_p(sc$systematic))
+st <- tab("run_scorecard")
+if (!is.null(st)) {
+  keep <- intersect(c("shortname", "group", "batch", "run_order", "n_flags", "flagged_metrics"), names(st))
+  cat("\n\n**Flags per run**\n\n"); kable(st[order(-st$n_flags, st$run_order), keep])
+}
+```
+
+`r if (is.null(s$markers)) "" else "## Layer 2: tissue purity and contamination markers"`
+
+```{r, eval = !is.null(s$markers)}
+mk <- s$markers
+cat(sprintf("Share of the total ion signal carried by each marker set, per run (unnormalised peptide intensities). Tissue setting: %s. Expected sets are flagged when low, neighbour and contamination sets when high (%s MAD; at least %s%% of the signal). Runs with a flag: %s.\n\n",
+            mk$params$tissue, format(mk$params$mad_k), format(100 * mk$params$min_share),
+            if (length(mk$summary$runs_flagged)) paste(mk$summary$runs_flagged, collapse = ", ") else "none"))
+```
+
+```{r, eval = !is.null(s$markers), out.width = "100%"}
+fig("marker_panel")
+```
+
+```{r, eval = !is.null(s$markers)}
+cat("\n\n**Marker sets**\n\n"); kable(mk$panel)
+sh <- tab("marker_panel_shares")
+if (!is.null(sh)) {
+  share_cols <- grep("^share_", names(sh), value = TRUE)
+  out <- sh[, intersect(c("shortname", "group"), names(sh))]
+  for (cn in share_cols) out[[sub("^share_", "", cn)]] <- pct(sh[[cn]])
+  cat("\n\n**Share of total signal per run (percent)**\n\n"); kable(out)
+}
+```
+
+`r if (is.null(s$qc)) "" else "## Layer 3: cohort quality control after normalisation"`
+
+```{r, eval = !is.null(s$qc)}
+cat(sprintf("Protein matrix for QC: %d proteins x %d runs (at least %d peptide(s) per protein; normalisation %s; roll-up %s). Outlier flags use %s MAD within %s for three metrics: missing fraction (high), median correlation with the other runs (low) and median intensity (shifted). A run with two or more flags is a candidate for exclusion.\n\n",
+            s$qc$n_proteins, s$qc$n_runs, s$qc$params$min_peptides, s$qc$params$norm, s$qc$params$rollup, format(s$qc$params$mad_k), s$qc$params$flag_strata))
+cat(sprintf("Missing fraction: median %.3f, maximum %.3f. Minimum median correlation: %.3f. Candidates (two or more flags): %s.\n\n",
+            s$qc$missing_fraction_median, s$qc$missing_fraction_max, s$qc$median_correlation_min,
+            if (length(s$qc$candidate_outliers)) paste(s$qc$candidate_outliers, collapse = ", ") else "none"))
+```
+
+```{r, eval = !is.null(s$qc), out.width = "100%"}
+fig("qc_missingness")
+```
+
+```{r, eval = !is.null(s$qc), out.width = "49%", fig.show = "hold"}
+fig("qc_pca"); fig("qc_outliers"); fig("qc_correlation"); fig("qc_medians"); fig("qc_drift"); fig("qc_batch"); fig("qc_pairs")
+```
+
+```{r, eval = !is.null(s$qc)}
+sm <- tab("qc_sample_metrics")
+if (!is.null(sm)) {
+  keep <- intersect(c("shortname", "group", "batch", "run_order", "detected_proteins", "missing_fraction", "median_log2_intensity", "median_correlation", "qc_flag_count"), names(sm))
+  out <- sm[, keep]
+  for (cn in intersect(c("missing_fraction", "median_log2_intensity", "median_correlation"), names(out))) out[[cn]] <- round(out[[cn]], 3)
+  cat("\n\n**Per-run metrics**\n\n"); kable(out[order(-out$qc_flag_count, out$run_order), ])
+}
+gc <- tab("qc_group_completeness")
+if (!is.null(gc)) { cat("\n\n**Completeness per group**\n\n"); gc$median_missing_fraction <- round(gc$median_missing_fraction, 3); kable(gc) }
+```
+
+## Verdict per run
+
+```{r}
+# one row per annotated run: flags from the three layers and the exclusion decision
+runs <- tab("samples_retained")
+if (!is.null(runs)) {
+  v <- tibble::tibble(run = runs$shortname, group = runs$group, sample_id = runs$sample_id)
+  st <- tab("run_scorecard"); sm <- tab("qc_sample_metrics"); ml <- tab("marker_panel_long")
+  v$scorecard_flags <- if (is.null(st)) NA_integer_ else st$n_flags[match(v$run, st$shortname)]
+  v$scorecard_metrics <- if (is.null(st)) NA_character_ else st$flagged_metrics[match(v$run, st$shortname)]
+  v$marker_flags <- if (is.null(ml)) NA_character_ else vapply(v$run, function(r) paste(ml$set[ml$shortname == r & ml$flagged], collapse = "; "), character(1))
+  v$cohort_flags <- if (is.null(sm)) NA_integer_ else sm$qc_flag_count[match(v$run, sm$shortname)]
+  v$excluded_after_qc <- ifelse(v$sample_id %in% (s$excluded_after_qc %||% character()), "yes", "")
+  v$sample_id <- NULL
+  v <- v[order(-(dplyr::coalesce(v$scorecard_flags, 0L) + dplyr::coalesce(v$cohort_flags, 0L)), v$run), ]
+  cat("Flags per layer and the exclusion decision taken on the QC page. A flag marks an unusual value for this cohort; it is evidence, not a verdict on its own. Exclusions are decided before any contrast is run and are written to the run record.\n\n")
+  kable(v)
+}
+```
+
+## Parameters and software
+
+```{r}
+p <- jsonlite::fromJSON(file.path(run_dir, "parameters.json"), simplifyVector = TRUE)
+flat <- function(x, prefix) if (is.null(x)) NULL else data.frame(parameter = paste0(prefix, ".", names(x)), value = vapply(x, function(v) paste(format(unlist(v)), collapse = ", "), character(1)), row.names = NULL)
+kable(rbind(flat(p$qc, "cohort_qc"), flat(p$scorecard, "scorecard"), flat(p$markers, "markers")))
+v <- s$versions
+cat("\n\n**Package versions**\n\n")
+kable(data.frame(package = names(v), version = unlist(lapply(v, function(x) if (is.null(x)) NA else x)), row.names = NULL))
+if (file.exists(file.path(run_dir, "qc_metrics.mzQC"))) cat("\n\nThe per-run metrics are also written as `qc_metrics.mzQC` (HUPO-PSI mzQC, JSON) next to this report.\n")
+```

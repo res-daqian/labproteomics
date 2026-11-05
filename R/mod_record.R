@@ -11,6 +11,7 @@ mod_record_ui <- function(id) {
       shiny::textAreaInput(ns("notes"), "Notes (written into the record)", rows = 4, placeholder = "Purpose of the analysis, decisions taken, who ran it"),
       shiny::checkboxInput(ns("adapters"), "Write upload tables for IPA, iPathwayGuide, STRING and Cytoscape", TRUE),
       shiny::checkboxInput(ns("report"), "Build the HTML report (needs pandoc; RStudio provides it)", TRUE),
+      shiny::checkboxInput(ns("qc_report"), "Also build the stand-alone QC report (PDF needs Chrome) and the mzQC file", TRUE),
       shiny::actionButton(ns("write"), "Write run record", class = "btn-primary w-100 mt-2")
     ),
     page_header("Run record", "One folder per analysis: the input with its checksum, every parameter, package versions, all tables and figures, the upload tables for external tools, and an HTML report that anyone can open."),
@@ -36,6 +37,7 @@ mod_record_server <- function(id, state) {
         if (!is.null(state$scorecard)) "Run scorecard (per-run values, flag rules, systematic differences, figure)" else "Run scorecard: not run",
         if (!is.null(state$markers)) "Marker panel (shares per run, sets, figure)" else "Marker panel: not run",
         if (!is.null(state$qc)) "Cohort QC tables, normalised protein matrix and all QC figures (PDF and PNG)" else "Cohort QC: not run",
+        if (!is.null(state$qc) && isTRUE(input$qc_report)) "Stand-alone QC report (qc_report.html, qc_report.pdf) and qc_metrics.mzQC" else "Stand-alone QC report: not written",
         if (length(state$results)) sprintf("Differential analysis: %s (full tables with treat and leave-one-out columns, hits, limma concordance, detection-only tables, leave-one-out refits, volcano figures)", paste(names(state$results), collapse = ", ")) else "Differential analysis: not run",
         if (length(state$excluded)) sprintf("Runs excluded after QC: %d", length(state$excluded)) else "Runs excluded after QC: none",
         if (!is.null(state$rescue)) "Rescue classification table, counts and figure" else "Rescue: not run",
@@ -58,11 +60,11 @@ mod_record_server <- function(id, state) {
                                              enrichment = state$enrichment, excluded = state$excluded, notes = input$notes,
                                              render_report = isTRUE(input$report), design = state$design, scorecard = state$scorecard,
                                              markers = state$markers, search_log = state$search_log, ortholog_map = state$ortholog_map,
-                                             adapters = isTRUE(input$adapters))),
+                                             adapters = isTRUE(input$adapters), qc_report = isTRUE(input$qc_report))),
         error = function(e) { notify_error("Run record failed", e); NULL }
       )
       if (is.null(out)) return()
-      state$last_run_dir <- list(dir = as.character(out), report = attr(out, "report"))
+      state$last_run_dir <- list(dir = as.character(out), report = attr(out, "report"), qc_pdf = attr(out, "qc_pdf"))
       shiny::showNotification("Run record written.", type = "message")
     })
 
@@ -72,9 +74,11 @@ mod_record_server <- function(id, state) {
       shiny::tagList(
         shiny::p(shiny::tags$code(lr$dir)),
         shiny::actionButton(session$ns("open_dir"), "Open folder", class = "btn-outline-secondary btn-sm"),
-        if (!is.null(lr$report) && !is.na(lr$report)) shiny::actionButton(session$ns("open_report"), "Open HTML report", class = "btn-outline-primary btn-sm ms-2")
+        if (!is.null(lr$report) && !is.na(lr$report)) shiny::actionButton(session$ns("open_report"), "Open HTML report", class = "btn-outline-primary btn-sm ms-2"),
+        if (!is.null(lr$qc_pdf) && !is.na(lr$qc_pdf)) shiny::actionButton(session$ns("open_qc_pdf"), "Open QC report (PDF)", class = "btn-outline-primary btn-sm ms-2")
       )
     })
+    shiny::observeEvent(input$open_qc_pdf, { lr <- state$last_run_dir; if (!is.null(lr) && !is.null(lr$qc_pdf) && !is.na(lr$qc_pdf)) utils::browseURL(lr$qc_pdf) })
 
     shiny::observeEvent(input$open_dir, { lr <- state$last_run_dir; if (!is.null(lr)) utils::browseURL(lr$dir) })
     shiny::observeEvent(input$open_report, { lr <- state$last_run_dir; if (!is.null(lr) && !is.na(lr$report)) utils::browseURL(lr$report) })

@@ -27,6 +27,8 @@ Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入�
 - 实测耗时（M4 Pro，16 样本）：导入 4 s；QC 约 35 s；单个对比约 35 s（含留一法）；GSEA 1–2 s；运行记录 + 报告约 10 s。
 - 备用运行记录：论文数据 `runs/<时间戳>_demo_backup_v3_thesis/report.html`（第三版界面，headless 生成，排除 L_CTRL_4 / L_CTRL_BLK）；公开数据 `runs/<时间戳>_demo_backup_v3/report.html`（排除 SZF3）。
 - 启动方式不变：双击 `launch_mac.command`，或 `Rscript scripts/launch_app.R`。演示脚本：`docs/demo_script_CN.md`（已按第三版重写）。QC 讲义：`docs/qc_primer_CN.md`（例子仍来自论文数据，开头已注明）。
+- **QC 报告（2026-11-05 晚）**：QC 页「Write QC report」→ `runs/<时间戳>_qc_<label>/` 里有 `qc_report.pdf`、`qc_report.html`、`qc_metrics.mzQC` 和全部 QC 表与图；Run record 页也会一并生成。PDF 靠本机 Chrome（chromote），没有 Chrome 时只有 HTML；mzQC 只装受控词表里有的指标（鉴定 precursor 数、平均电荷、污染蛋白份额、批次标签），其余在 CSV。MsQuality 需要 mzML，没有接。
+- **给同事的安装**：`source("scripts/install_dependencies.R")` 再 `remotes::install_local(".")`；或打包 `labproteomics_0.0.1.tar.gz` 分发；GitHub 发布等 Daqian 确认（仓库名、公开或私有）。
 - 第二版（2026-11-05 凌晨早些时候）的内容仍在：设计检查、run 成绩单、marker 面板、检出差异、limma treat 门槛、留一法、GSEA/ORA 多集合、导出适配、运行记录与报告。
 - 未做：表型关联 / WGCNA；msqrob2 第二引擎；小鸡直系同源表；Windows 实测；renv；异步计算；Spectronaut / FragPipe 实测数据（成绩单只认 DIA-NN 的 stats 文件；候选 Spectronaut 公开数据 PXD033653，775 MB）；人类 FASTA 的下载；若要 Windows 上字体完全一致，需打包一款 OFL 网络字体（需 Daqian 同意下载）。
 
@@ -66,4 +68,5 @@ Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入�
 - 2026-11-04 晚：demo 数据改为 Long-term 36 样本；msdap 的电荷态 / 歧义序列选择与行顺序依赖处理；文档同步；备用运行记录重建。
 - 2026-11-05 凌晨（早）：QC 讨论后的第二版；新单元测试 4 个文件；golden 测试扩展；两次 commit（engine；界面 + 文档）。
 - 2026-11-05 凌晨（晚）：第三版：公开数据 PXD079891 作 demo（论文数据移到 golden_data）；导入器从 DIA-NN 报告取基因名；新配色 + Arial 图形主题；新界面字体与配色；Rescue 页自动隐藏；漏切率规则改为队列级；内皮 marker 集合；报告 p 值格式；README / PROVENANCE / CLAUDE.md / 演示脚本 / QC 讲义更新；三次 commit（数据与引擎；图形与界面；文档）。
+- 2026-11-05 晚（更晚）：QC 报告：`write_qc_record()` / `render_qc_report()`（`inst/report/qc_report.Rmd`，HTML 用 Chrome 打印成 PDF，含每个 run 的判定表）、`write_mzqc()`（rmzqc，HUPO-PSI mzQC 1.0，schema 校验通过）；QC 页新增「Write QC report」按钮，Run record 页勾选项；`scripts/install_dependencies.R` 一键装依赖；README 安装三步；文档：`docs/parameters_and_stack_CN.md`（参数与技术栈，私人）、`docs/lab_meeting_handout.md`（给同事）、`docs/lab_meeting_talk_CN.md`（讲法提纲）。装了 rmzqc（Bioconductor）。
 - 2026-11-05 晚：周五改用论文数据演示：`launch_mac_thesis_data.command`、`scripts/launch_app.R <folder>`、demo 按钮的空状态文字取自 `demo_settings.json` 的 label；论文数据在第三版界面上 headless 全流程重跑并生成备用运行记录；演示脚本换回论文数据，公开数据版另存。

@@ -38,12 +38,14 @@ safe_label <- function(x) gsub("[^A-Za-z0-9_-]+", "_", x)
 #' @param search_log optional [read_diann_log()] result
 #' @param ortholog_map optional ortholog map used for the adapter exports
 #' @param adapters write the external-tool adapter tables (IPA, iPathwayGuide, STRING, Cytoscape)
-#' @return the run folder (invisibly)
+#' @param qc_report also build the stand-alone QC report (`qc_report.html`, `qc_report.pdf` when
+#'   Chrome is available) and the mzQC file when QC results are present
+#' @return the run folder (invisibly) with attributes `report`, `qc_report` and `qc_pdf`
 #' @export
 write_run_record <- function(run_dir, ds, qc = NULL, dea = list(), rescue = NULL, enrichment = list(),
                              excluded = character(), notes = "", render_report = TRUE,
                              design = NULL, scorecard = NULL, markers = NULL, search_log = NULL,
-                             ortholog_map = NULL, adapters = TRUE) {
+                             ortholog_map = NULL, adapters = TRUE, qc_report = FALSE) {
   run_dir <- ensure_dir(run_dir)
   tdir <- ensure_dir(file.path(run_dir, "tables"))
   fdir <- ensure_dir(file.path(run_dir, "figures"))
@@ -185,12 +187,23 @@ write_run_record <- function(run_dir, ds, qc = NULL, dea = list(), rescue = NULL
       warning("HTML report not built: ", conditionMessage(e)); NA_character_
     })
   }
+  qc_html <- NA_character_; qc_pdf <- NA_character_
+  if (isTRUE(qc_report) && !is.null(qc)) {
+    if (requireNamespace("rmzqc", quietly = TRUE)) {
+      tryCatch(write_mzqc(file.path(run_dir, "qc_metrics.mzQC"), ds, scorecard = scorecard, markers = markers, qc = qc, search_log = search_log),
+               error = function(e) warning("mzQC not written: ", conditionMessage(e)))
+    }
+    rep <- tryCatch(render_qc_report(run_dir, pdf = TRUE), error = function(e) { warning("QC report not built: ", conditionMessage(e)); NULL })
+    if (!is.null(rep)) { qc_html <- rep$html; qc_pdf <- rep$pdf }
+  }
   files <- list.files(run_dir, recursive = TRUE)
   writeLines(c(
     "Run record written by labproteomics", sprintf("Created: %s", summary$created), "",
     "Contents:", paste0("  ", files)
   ), file.path(run_dir, "README.txt"))
   attr(run_dir, "report") <- report_path
+  attr(run_dir, "qc_report") <- qc_html
+  attr(run_dir, "qc_pdf") <- qc_pdf
   invisible(run_dir)
 }
 

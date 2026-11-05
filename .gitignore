@@ -16,3 +16,4 @@ inst/doc
 /Meta/
 *.html
 !inst/report/*.html
+dist/

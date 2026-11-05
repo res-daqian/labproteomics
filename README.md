@@ -50,14 +50,23 @@ The statistical engine is a set of plain R functions in `R/`; the interface only
 
 ## Install (first time)
 
+Three steps, the same on macOS and Windows. No compiler or Rtools is needed.
+
+1. Install R (4.4 or newer) and RStudio.
+2. Get the workbench folder (a zip from the lab, or `git clone` of the repository when it is on
+   GitHub) and open it in RStudio. In the R console run the dependency installer once; it takes
+   10 to 20 minutes the first time:
+
 ```r
-install.packages(c("devtools", "BiocManager"))
-BiocManager::install(c("limma", "DEqMS", "fgsea", "MSnbase", "ProtGenerics", "vsn"))
-devtools::install_github("ftwkoopmans/msdap")        # follow the MS-DAP page if a dependency fails
-install.packages(c("shiny", "bslib", "DT", "dplyr", "tidyr", "readr", "ggplot2", "ggrepel",
-                   "patchwork", "msigdbr", "rmarkdown", "digest", "jsonlite", "rlang", "readxl",
-                   "arrow", "ragg", "systemfonts"))
-devtools::install("path/to/gui_development_proteomics_workflow")   # this folder
+source("scripts/install_dependencies.R")
+```
+
+3. Install the package itself, with one of these:
+
+```r
+remotes::install_local(".", upgrade = "never")          # from the opened folder
+remotes::install_local("labproteomics_0.0.1.tar.gz")     # from the archive handed out by the lab
+remotes::install_github("<github-user>/labproteomics")   # from GitHub, once it is published there
 ```
 
 Then fetch the demo data once (164 MB from the PRIDE archive; see "Demo data" below):
@@ -67,7 +76,8 @@ Then fetch the demo data once (164 MB from the PRIDE archive; see "Demo data" be
 Rscript scripts/get_demo_data.R
 ```
 
-MS-DAP installation notes for Windows and macOS: https://github.com/ftwkoopmans/msdap
+If a Bioconductor or MS-DAP step fails, follow the notes on the MS-DAP page:
+https://github.com/ftwkoopmans/msdap
 
 ## Start the application
 

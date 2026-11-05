@@ -16,7 +16,13 @@ mod_qc_ui <- function(id) {
       shiny::hr(),
       side_title("Exclusion"),
       shiny::selectizeInput(ns("exclude"), "Exclude runs from every contrast", choices = NULL, multiple = TRUE),
-      shiny::helpText("Decide exclusions from the QC evidence, before looking at any contrast. They are applied by the contrasts and written to the run record. The QC figures always show every annotated run.")
+      shiny::helpText("Decide exclusions from the QC evidence, before looking at any contrast. They are applied by the contrasts and written to the run record. The QC figures always show every annotated run."),
+      shiny::hr(),
+      side_title("QC report"),
+      shiny::textInput(ns("report_label"), "Label", value = "qc"),
+      shiny::actionButton(ns("write_report"), "Write QC report (PDF, HTML, mzQC)", class = "btn-outline-primary w-100"),
+      shiny::helpText("A stand-alone record with the three QC layers, a verdict table per run and the exclusions. The PDF needs Chrome; the mzQC file (HUPO-PSI standard) needs the rmzqc package."),
+      shiny::uiOutput(ns("report_result"))
     ),
     page_header("Quality control", "Three layers: the instrument and identification metrics of every run (scorecard), the tissue composition of every run (marker panel), and the cohort after normalisation (missing values, centring, PCA, correlation, drift, batches, pairs)."),
     shiny::uiOutput(ns("summary")),
@@ -89,6 +95,39 @@ mod_qc_server <- function(id, state) {
     })
 
     shiny::observeEvent(input$exclude, { state$excluded <- input$exclude %||% character() }, ignoreNULL = FALSE, ignoreInit = TRUE)
+
+    qc_record <- shiny::reactiveVal(NULL)
+    shiny::observeEvent(input$write_report, {
+      if (is.null(state$qc)) { shiny::showNotification("Run QC first.", type = "warning"); return() }
+      root <- getOption("labproteomics.runs_dir", file.path(getwd(), "runs"))
+      dir <- tryCatch(new_run_dir(root, paste0("qc_", input$report_label)), error = function(e) { notify_error("Folder", e); NULL })
+      if (is.null(dir)) return()
+      out <- tryCatch(
+        shiny::withProgress(message = "Writing the QC report", detail = "tables, figures, PDF and mzQC", value = 0.3,
+                            write_qc_record(dir, state$ds, qc = state$qc, scorecard = state$scorecard, markers = state$markers,
+                                            design = state$design, excluded = state$excluded, search_log = state$search_log,
+                                            notes = sprintf("QC report written from the QC page; %d run(s) excluded after QC.", length(state$excluded)))),
+        error = function(e) { notify_error("QC report failed", e); NULL }
+      )
+      if (is.null(out)) return()
+      qc_record(list(dir = as.character(out), html = attr(out, "html"), pdf = attr(out, "pdf"), mzqc = attr(out, "mzqc")))
+      shiny::showNotification("QC report written.", type = "message")
+    })
+    output$report_result <- shiny::renderUI({
+      r <- qc_record()
+      if (is.null(r)) return(NULL)
+      shiny::div(class = "mt-2",
+        shiny::p(class = "lp-note mb-1", shiny::tags$code(basename(r$dir))),
+        if (!is.na(r$pdf)) shiny::actionButton(session$ns("open_pdf"), "Open PDF", class = "btn-outline-secondary btn-sm me-1"),
+        shiny::actionButton(session$ns("open_html"), "Open HTML", class = "btn-outline-secondary btn-sm me-1"),
+        shiny::actionButton(session$ns("open_dir"), "Open folder", class = "btn-outline-secondary btn-sm"),
+        if (is.na(r$pdf)) shiny::p(class = "lp-note mt-1 mb-0", "PDF not written (Chrome not found); the HTML report is complete."),
+        if (is.na(r$mzqc)) shiny::p(class = "lp-note mt-1 mb-0", "mzQC not written (rmzqc not installed).")
+      )
+    })
+    shiny::observeEvent(input$open_pdf, { r <- qc_record(); if (!is.null(r) && !is.na(r$pdf)) utils::browseURL(r$pdf) })
+    shiny::observeEvent(input$open_html, { r <- qc_record(); if (!is.null(r) && !is.na(r$html)) utils::browseURL(r$html) })
+    shiny::observeEvent(input$open_dir, { r <- qc_record(); if (!is.null(r)) utils::browseURL(r$dir) })
 
     plots <- shiny::reactive({ shiny::req(state$qc); qc_plots(state$qc) })
     draw <- function(name, missing_text) {

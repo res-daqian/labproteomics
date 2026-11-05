@@ -83,13 +83,19 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
 ## Where things are
 
 - `R/` engine (`utils`, `theme`, `annotation`, `import`, `design`, `runstats`, `markers`, `qc`,
-  `dea`, `dea_extras`, `rescue`, `enrichment`, `export`, `report`) and interface (`app.R` with the
-  theme and the building blocks `stat_tile`, `page_header`, `msg_list`; `mod_*.R`).
-  `inst/report/run_report.Rmd` report template.
+  `dea`, `dea_extras`, `rescue`, `enrichment`, `export`, `report`, `qc_report`) and interface
+  (`app.R` with the theme and the building blocks `stat_tile`, `page_header`, `msg_list`;
+  `mod_*.R`). `inst/report/run_report.Rmd` run report; `inst/report/qc_report.Rmd` + `.css`
+  stand-alone QC report (HTML, printed to PDF by chromote + Chrome; mzQC via rmzqc, local CV only,
+  single `MzQCcvParameter` for the batch label because a list nests and fails the schema).
 - `tests/testthat/` unit tests + golden tests. `demo_data/` public demo (large files gitignored;
   `demo_data/README.md`). `golden_data/` thesis subset for the golden tests (gitignored).
 - `runs/` run records (gitignored). `scripts/` helpers (`launch_app.R`, `get_demo_data.R`,
   `make_golden_subset.R`, `make_golden_annotation.R`).
 - `docs/` demo scripts (`demo_script_CN.md` = thesis data, `demo_script_public_data_CN.md` =
-  public data), QC primer for Daqian (`qc_primer_CN.md`) and notes. `README.md` user guide
-  (Mac / Windows install and start).
+  public data), QC primer (`qc_primer_CN.md`), parameters and stack explained
+  (`parameters_and_stack_CN.md`, private), lab-meeting handout for colleagues
+  (`lab_meeting_handout.md`, English) and talk outline (`lab_meeting_talk_CN.md`). `README.md`
+  user guide; `scripts/install_dependencies.R` one-shot dependency installer for colleagues.
+- Publishing to GitHub and `git push` are opt-in only (Daqian asked on 2026-11-05 whether the
+  package can go to GitHub; the `gh` CLI is logged in as res-daqian; wait for his explicit go).

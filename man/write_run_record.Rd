@@ -19,7 +19,8 @@ write_run_record(
   markers = NULL,
   search_log = NULL,
   ortholog_map = NULL,
-  adapters = TRUE
+  adapters = TRUE,
+  qc_report = FALSE
 )
 }
 \arguments{
@@ -52,9 +53,12 @@ write_run_record(
 \item{ortholog_map}{optional ortholog map used for the adapter exports}
 
 \item{adapters}{write the external-tool adapter tables (IPA, iPathwayGuide, STRING, Cytoscape)}
+
+\item{qc_report}{also build the stand-alone QC report (\code{qc_report.html}, \code{qc_report.pdf} when
+Chrome is available) and the mzQC file when QC results are present}
 }
 \value{
-the run folder (invisibly)
+the run folder (invisibly) with attributes \code{report}, \code{qc_report} and \code{qc_pdf}
 }
 \description{
 Write the run record

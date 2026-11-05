@@ -5,7 +5,7 @@ Daqian 2026-11-05 晚决定：周五用自己的数据演示。数据在 `golden
 ## 演示前检查（周四晚 / 周五早）
 - [ ] 双击 `launch_mac_thesis_data.command`（第一次：右键 > 打开），确认浏览器打开应用；左上角空状态提示写着 "fills in the Long-term retina data of the PhD project"。终端等价命令：`Rscript scripts/launch_app.R golden_data`。
 - [ ] 用下面的流程从头到尾点一遍，确认每页都出图。
-- [ ] 备用：现成的运行记录 `runs/<时间戳>_demo_backup_v3_thesis/report.html`（卡住时直接打开）。
+- [ ] 备用：现成的运行记录 `runs/2026-11-05_212256_demo_backup_v3_thesis_qc/report.html（同一文件夹里有 qc_report.pdf）`（卡住时直接打开）。
 - [ ] 万一第三版出问题：回到周三的第一版。那一版的 demo 按钮读 `demo_data/`，所以要先把 `golden_data/` 里的文件复制到 `demo_data/`（公开数据的文件可以先挪开），再执行下面两行；demo 后 `git checkout main` 并恢复文件。
 
 ```
