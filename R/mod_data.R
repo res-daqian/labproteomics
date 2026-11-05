@@ -43,6 +43,8 @@ mod_data_ui <- function(id) {
 mod_data_server <- function(id, state) {
   shiny::moduleServer(id, function(input, output, session) {
     demo <- getOption("labproteomics.demo_dir", "")
+    demo_label <- tryCatch(jsonlite::read_json(file.path(demo, "demo_settings.json"))$label, error = function(e) NULL)
+    if (is.null(demo_label)) demo_label <- sprintf("the data in %s", basename(demo))
 
     shiny::observeEvent(input$use_demo, {
       if (!nzchar(demo) || !dir.exists(demo)) {
@@ -153,7 +155,7 @@ mod_data_server <- function(id, state) {
 
     output$boxes <- shiny::renderUI({
       ds <- state$ds %||% state$ds_raw
-      if (is.null(ds)) return(empty_state("Import a quantification file to start. The demo button fills in the public demo data set (PRIDE PXD079891: human endothelial cells, MANCR knockdown against control, 8 donors, 16 runs)."))
+      if (is.null(ds)) return(empty_state(sprintf("Import a quantification file to start. The demo button fills in %s.", demo_label)))
       s <- import_summary(ds)
       bslib::layout_columns(
         col_widths = c(3, 3, 3, 3),

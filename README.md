@@ -73,6 +73,8 @@ MS-DAP installation notes for Windows and macOS: https://github.com/ftwkoopmans/
 
 - macOS: double-click `launch_mac.command` (first time: right-click, Open).
 - Windows: double-click `launch_windows.bat`.
+- From a terminal, with another folder behind the demo button: `Rscript scripts/launch_app.R <folder>`
+  (the folder needs the report, its annotation `demo_sample_annotation.csv` and a `demo_settings.json`).
 - From R or RStudio:
 
 ```r

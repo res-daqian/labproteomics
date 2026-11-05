@@ -1,13 +1,14 @@
 # PROGRESS — 当前状态（先读这页）
 
-Last updated: 2026-11-05 凌晨（第三版：公开数据 demo、新配色与 Arial 图、新界面字体与配色、Rescue 页按设计自动隐藏）
+Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入口）
 
 ## 1. 目标与范围
 - 导师要求：把 PhD 的 MS 蛋白组分析流程打包成 **本地运行的 Shiny 应用**，给不写代码的同事用。
 - 第一次 demo：**本周五 2026-11-06 lab meeting**（Daqian：做不完也没关系）。
 - 平台：Mac + Windows。上游软件：DIA-NN、Spectronaut 为主；ProteinPilot（SWATH）、FragPipe 也有。
 - **demo 数据（2026-11-05 起）：公开数据集 PRIDE PXD079891**（Zhang 等，J Physiol 2026；CC0）：HUVEC，8 位供体（4 女 4 男）配对，对照 ASO vs MANCR ASO，16 个 run，DIA-NN 1.9。`scripts/get_demo_data.R` 从 PRIDE 下载 `report.parquet`（164024858 字节）、stats、log、SDRF，并生成注释表（`demo_data/README.md`）。Daqian 2026-11-05：「放弃用我自己的数据」。
-- **论文数据只留给 golden 测试**：Long-term 36 个样本的子集移到 `golden_data/`（整个目录 gitignored，只读），由 `scripts/make_golden_subset.R` + `make_golden_annotation.R` 重建；不随软件分发。
+- **论文数据不随软件分发**：Long-term 36 个样本的子集移到 `golden_data/`（整个目录 gitignored，只读），由 `scripts/make_golden_subset.R` + `make_golden_annotation.R` 重建；golden 测试用它。
+- **周五 demo 用论文数据**（Daqian 2026-11-05 晚：「还是用我自己的数据进行展示吧，毕竟我最熟悉」）：双击 `launch_mac_thesis_data.command`，等于 `Rscript scripts/launch_app.R golden_data`；demo 按钮就填入 `golden_data/` 的文件（`demo_settings.json` 指定组织 retina、物种 Homo sapiens、标签）。演示脚本 `docs/demo_script_CN.md` 已换回论文数据；公开数据版在 `docs/demo_script_public_data_CN.md`。
 - Daqian 2026-11-05 回答：pooled QC 以后尽量带，旧数据基本没有；设计各种都有，每组 n 5–10；组织以视网膜、RPE/脉络膜、巩膜、泪液为主；小鸡直系同源表现在没有；同事基本留着 full report；界面要更美观、字体要换；demo 数据不支持 rescue 时可暂时去掉该模块。
 
 ## 2. 现在做到哪
@@ -24,7 +25,7 @@ Last updated: 2026-11-05 凌晨（第三版：公开数据 demo、新配色与 A
   8. 报告里 p / q 值改为三位有效数字（原来四位小数把 1e-7 显示成 0）。
 - **公开数据上的结果（排除 SZF3 供体后，7 对）**：成绩单两项以上标记 = SZF3NC、SZF3KD（作者也剔除了这位供体）；批次间系统差异：鉴定数、MS1 质量误差；marker：内皮 0.5–0.9%，SZF4KD 角蛋白 1.3%，Y 染色体蛋白只在男性 run；队列 QC 候选离群 = SZF3KD、SZF3NC；配对对比 5978 tested、1324 hits（q 987、treat 31、fragile 441、detection-only 38），非配对 1149 hits（q 429）；GSEA Hallmark 9 个集合显著（干扰素 α/γ、MYC targets、EMT、TNFA/NF-κB、炎症、UPR 下调）；ORA Reactome 3 个。
 - 实测耗时（M4 Pro，16 样本）：导入 4 s；QC 约 35 s；单个对比约 35 s（含留一法）；GSEA 1–2 s；运行记录 + 报告约 10 s。
-- 备用运行记录：`runs/<时间戳>_demo_backup_v3/report.html`（第三版，headless 生成，含排除 SZF3）。
+- 备用运行记录：论文数据 `runs/<时间戳>_demo_backup_v3_thesis/report.html`（第三版界面，headless 生成，排除 L_CTRL_4 / L_CTRL_BLK）；公开数据 `runs/<时间戳>_demo_backup_v3/report.html`（排除 SZF3）。
 - 启动方式不变：双击 `launch_mac.command`，或 `Rscript scripts/launch_app.R`。演示脚本：`docs/demo_script_CN.md`（已按第三版重写）。QC 讲义：`docs/qc_primer_CN.md`（例子仍来自论文数据，开头已注明）。
 - 第二版（2026-11-05 凌晨早些时候）的内容仍在：设计检查、run 成绩单、marker 面板、检出差异、limma treat 门槛、留一法、GSEA/ORA 多集合、导出适配、运行记录与报告。
 - 未做：表型关联 / WGCNA；msqrob2 第二引擎；小鸡直系同源表；Windows 实测；renv；异步计算；Spectronaut / FragPipe 实测数据（成绩单只认 DIA-NN 的 stats 文件；候选 Spectronaut 公开数据 PXD033653，775 MB）；人类 FASTA 的下载；若要 Windows 上字体完全一致，需打包一款 OFL 网络字体（需 Daqian 同意下载）。
@@ -65,3 +66,4 @@ Last updated: 2026-11-05 凌晨（第三版：公开数据 demo、新配色与 A
 - 2026-11-04 晚：demo 数据改为 Long-term 36 样本；msdap 的电荷态 / 歧义序列选择与行顺序依赖处理；文档同步；备用运行记录重建。
 - 2026-11-05 凌晨（早）：QC 讨论后的第二版；新单元测试 4 个文件；golden 测试扩展；两次 commit（engine；界面 + 文档）。
 - 2026-11-05 凌晨（晚）：第三版：公开数据 PXD079891 作 demo（论文数据移到 golden_data）；导入器从 DIA-NN 报告取基因名；新配色 + Arial 图形主题；新界面字体与配色；Rescue 页自动隐藏；漏切率规则改为队列级；内皮 marker 集合；报告 p 值格式；README / PROVENANCE / CLAUDE.md / 演示脚本 / QC 讲义更新；三次 commit（数据与引擎；图形与界面；文档）。
+- 2026-11-05 晚：周五改用论文数据演示：`launch_mac_thesis_data.command`、`scripts/launch_app.R <folder>`、demo 按钮的空状态文字取自 `demo_settings.json` 的 label；论文数据在第三版界面上 headless 全流程重跑并生成备用运行记录；演示脚本换回论文数据，公开数据版另存。

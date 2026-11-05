@@ -22,8 +22,12 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   (stats, log, SDRF, annotation, settings, README) are committed. Daqian decided this on
   2026-11-05 ("放弃用我自己的数据").
 - The thesis subset (36 Long-term runs, Daqian's own data) lives in `golden_data/` (fully
-  gitignored, read-only copies) and is used only by the golden tests. It is rebuilt with
-  `scripts/make_golden_subset.R` followed by `scripts/make_golden_annotation.R`.
+  gitignored, read-only copies). It is used by the golden tests and, on Daqian's Mac only, as the
+  data of the Friday demo (`launch_mac_thesis_data.command` = `Rscript scripts/launch_app.R
+  golden_data`; Daqian decided on 2026-11-05 evening to present his own data). It is rebuilt with
+  `scripts/make_golden_subset.R` followed by `scripts/make_golden_annotation.R`. A folder used by
+  the demo button needs `demo_settings.json` (label, tissue, species); the one in `golden_data/`
+  is local too.
 - Functions were **copied and refactored** from the PhD scripts, never sourced across repositories.
   `PROVENANCE.md` maps every engine function to its source script and commit. Keep it current.
 - The PhD results stay the reference: the golden tests in `tests/testthat/test-golden.R` must
@@ -86,5 +90,6 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   `demo_data/README.md`). `golden_data/` thesis subset for the golden tests (gitignored).
 - `runs/` run records (gitignored). `scripts/` helpers (`launch_app.R`, `get_demo_data.R`,
   `make_golden_subset.R`, `make_golden_annotation.R`).
-- `docs/` demo script, QC primer for Daqian (`qc_primer_CN.md`) and notes. `README.md` user guide
+- `docs/` demo scripts (`demo_script_CN.md` = thesis data, `demo_script_public_data_CN.md` =
+  public data), QC primer for Daqian (`qc_primer_CN.md`) and notes. `README.md` user guide
   (Mac / Windows install and start).
