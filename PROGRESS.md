@@ -28,6 +28,7 @@ Last updated: 2026-11-05 晚（第三版 + 周五改用论文数据演示的入�
 - 备用运行记录：论文数据 `runs/<时间戳>_demo_backup_v3_thesis/report.html`（第三版界面，headless 生成，排除 L_CTRL_4 / L_CTRL_BLK）；公开数据 `runs/<时间戳>_demo_backup_v3/report.html`（排除 SZF3）。
 - 启动方式不变：双击 `launch_mac.command`，或 `Rscript scripts/launch_app.R`。演示脚本：`docs/demo_script_CN.md`（已按第三版重写）。QC 讲义：`docs/qc_primer_CN.md`（例子仍来自论文数据，开头已注明）。
 - **QC 报告（2026-11-05 晚）**：QC 页「Write QC report」→ `runs/<时间戳>_qc_<label>/` 里有 `qc_report.pdf`、`qc_report.html`、`qc_metrics.mzQC` 和全部 QC 表与图；Run record 页也会一并生成。PDF 靠本机 Chrome（chromote），没有 Chrome 时只有 HTML；mzQC 只装受控词表里有的指标（鉴定 precursor 数、平均电荷、污染蛋白份额、批次标签），其余在 CSV。MsQuality 需要 mzML，没有接。
+- **GitHub**：2026-11-05 晚公开仓库 https://github.com/res-daqian/labproteomics（Daqian 自己执行 `gh repo create`，main 与 tag 已推送；本机 `origin` 已配置）。同事安装：`remotes::install_github("res-daqian/labproteomics")`，已从 GitHub 实装验证。
 - **给同事的安装**：`source("scripts/install_dependencies.R")` 再 `remotes::install_local(".")`；或打包 `labproteomics_0.0.1.tar.gz` 分发；GitHub 发布等 Daqian 确认（仓库名、公开或私有）。
 - 第二版（2026-11-05 凌晨早些时候）的内容仍在：设计检查、run 成绩单、marker 面板、检出差异、limma treat 门槛、留一法、GSEA/ORA 多集合、导出适配、运行记录与报告。
 - 未做：表型关联 / WGCNA；msqrob2 第二引擎；小鸡直系同源表；Windows 实测；renv；异步计算；Spectronaut / FragPipe 实测数据（成绩单只认 DIA-NN 的 stats 文件；候选 Spectronaut 公开数据 PXD033653，775 MB）；人类 FASTA 的下载；若要 Windows 上字体完全一致，需打包一款 OFL 网络字体（需 Daqian 同意下载）。

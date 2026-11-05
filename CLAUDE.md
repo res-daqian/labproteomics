@@ -97,5 +97,7 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   (`parameters_and_stack_CN.md`, private), lab-meeting handout for colleagues
   (`lab_meeting_handout.md`, English) and talk outline (`lab_meeting_talk_CN.md`). `README.md`
   user guide; `scripts/install_dependencies.R` one-shot dependency installer for colleagues.
-- Publishing to GitHub and `git push` are opt-in only (Daqian asked on 2026-11-05 whether the
-  package can go to GitHub; the `gh` CLI is logged in as res-daqian; wait for his explicit go).
+- Public repository since 2026-11-05 evening: https://github.com/res-daqian/labproteomics
+  (remote `origin`, branch `main`, tag `demo-2026-11-06-safe` pushed; Daqian created it himself
+  with `gh repo create` because the harness blocks publication actions). `git push` stays opt-in:
+  ask before every push unless Daqian says pushes are routine.
