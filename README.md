@@ -53,7 +53,7 @@ The statistical engine is a set of plain R functions in `R/`; the interface only
 Three steps, the same on macOS and Windows. No compiler or Rtools is needed.
 
 1. Install R (4.4 or newer) and RStudio.
-2. Get the workbench folder (a zip from the lab, or `git clone` of the repository when it is on
+2. Get the workbench folder (a zip from the lab, or `git clone https://github.com/res-daqian/labproteomics` of the repository on
    GitHub) and open it in RStudio. In the R console run the dependency installer once; it takes
    10 to 20 minutes the first time:
 
@@ -66,7 +66,7 @@ source("scripts/install_dependencies.R")
 ```r
 remotes::install_local(".", upgrade = "never")          # from the opened folder
 remotes::install_local("labproteomics_0.0.1.tar.gz")     # from the archive handed out by the lab
-remotes::install_github("<github-user>/labproteomics")   # from GitHub, once it is published there
+remotes::install_github("res-daqian/labproteomics")        # from GitHub (https://github.com/res-daqian/labproteomics)
 ```
 
 Then fetch the demo data once (164 MB from the PRIDE archive; see "Demo data" below):

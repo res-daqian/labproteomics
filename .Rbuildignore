@@ -12,3 +12,4 @@
 ^golden_data$
 ^launch_mac\.command$
 ^launch_windows\.bat$
+^LICENSE\.md$

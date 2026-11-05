@@ -117,8 +117,10 @@ contrast and never change the hit list:
 
 ## 9. How to get it
 
-Install R and RStudio, open the workbench folder, run `source("scripts/install_dependencies.R")`
-once, then install the package (README, section "Install"). The demo data set is public (PRIDE
+The code is public: https://github.com/res-daqian/labproteomics (MIT licence). Install R and
+RStudio, open the workbench folder, run `source("scripts/install_dependencies.R")` once, then
+install the package with `remotes::install_github("res-daqian/labproteomics")` (README, section
+"Install"). The demo data set is public (PRIDE
 PXD079891, human endothelial cells, 16 runs) and is downloaded with one command. Start the
 application by double-clicking `launch_mac.command` or `launch_windows.bat`.
 
