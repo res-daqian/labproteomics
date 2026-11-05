@@ -1,1 +1,1 @@
-{"dataset": "PXD079891", "tissue": "cells_endothelial", "species": "Homo sapiens", "case": "MANCR_KD", "control": "Control", "pair_by": "subject_id"}
+{"dataset": "PXD079891", "tissue": "cells_endothelial", "species": "Homo sapiens", "case": "MANCR_KD", "control": "Control", "pair_by": "subject_id", "label": "the public PRIDE PXD079891 data set (human endothelial cells, MANCR knockdown against control, 8 donors, 16 runs)"}
