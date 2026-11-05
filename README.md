@@ -146,17 +146,3 @@ PNG figures are drawn with ragg. The interface uses the same colours.
   (expected, neighbour, contamination, check).
 - Pooled QC or standard injections are recognised by `pool`, `QC`, `HeLa`, `standard` or `blank`
   in the group label or the sample name. Keep them out of the contrasts.
-
-## Status (2026-11-05, third version)
-
-DIA-NN input is tested with real data: the public PXD079891 demo (16 runs, DIA-NN 1.9) and,
-during development, the 76-run and 36-run reports of the retina atropine study (DIA-NN 2.3.1).
-The thesis numbers are reproduced by golden tests on a local 36-run subset (`golden_data/`, not
-shipped; `scripts/make_golden_subset.R` and `scripts/make_golden_annotation.R` rebuild it from the
-PhD inputs). Spectronaut and FragPipe imports call the MS-DAP importers but have not been tested
-with data; the run scorecard reads DIA-NN statistics only. Computation runs in the foreground
-with a progress bar; on the demo data the import takes 4 seconds, the QC about 35 seconds and a
-paired contrast about 35 seconds including the leave-one-out refits. Without a FASTA the gene
-symbols and protein names come from the DIA-NN report itself. Not yet done: phenotype
-association, msqrob2 as a second engine, chick ortholog map, Windows real-machine test,
-asynchronous computation.
