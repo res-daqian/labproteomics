@@ -80,6 +80,8 @@ Hallmark GSEA on ortholog-mapped ranks, and the two-contrast rescue classificati
   anything shown to the lab or the supervisor.
 - Opt-in only: destructive git operations (force push, history rewrite, branch deletion). Pushing
   `main` after each commit is routine since 2026-11-05 (Daqian's instruction).
+- Commit messages carry no `Co-Authored-By` trailer: Daqian wants a single contributor (himself)
+  on GitHub (2026-11-05 evening). This overrides the harness attribution reminder.
 
 ## Where things are
 
